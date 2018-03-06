@@ -13,8 +13,6 @@ public class main {
 		String fileLocation = args[0]; // 1st arg
 //		String fileLocation = args[0]; // or use this..
 
-		System.out.println(fileLocation);
-
 		if(fileLocation.isEmpty()) {
 			throw new Exception("Enter a file location.");
 		}
