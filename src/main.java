@@ -11,7 +11,7 @@ public class main {
 	
 	public static void main(String[] args) throws Exception {
 		String fileLocation = args[0]; // 1st arg
-//		String fileLocation = args[0]; // or use this..
+//		String fileLocation = ""; // or use this..
 
 		if(fileLocation.isEmpty()) {
 			throw new Exception("Enter a file location.");
