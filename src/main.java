@@ -1,3 +1,7 @@
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -5,58 +9,84 @@ public class main {
 
 	public static HashTable hashTable; 
 	
-	public static void main(String[] args) {
-		String s1 = "aroseisaroseisarose";
-		String s2 = "aroseisaflowerwhichisarose"; 
-		
-		HashStringSimilarity stringSimilarity = new HashStringSimilarity(s1, s2, 4);
-		
-		System.out.println(stringSimilarity.similarity());
-		
-		BruteForceSimilarity brute = new BruteForceSimilarity(s1, s2, 4); 
-		ArrayList<Integer> empty = new ArrayList<Integer>(); 
-		System.out.println(empty.size());
-		
-		HashCodeSimilarity hashCodeSimilarity = new HashCodeSimilarity(s1, s2, 4); 
-		System.out.println(hashCodeSimilarity.similarity());
-		hashCodeSimilarity.getS().printTable();
-		hashCodeSimilarity.getT().printTable(); 
-//		
+	public static void main(String[] args) throws Exception {
+		String fileLocation = args[0]; // 1st arg
+//		String fileLocation = args[0]; // or use this..
 
-		
-//		System.out.println('a'-96);
-//		LinkedList<Tuple> list = new LinkedList<Tuple>(); 
-//		list.add(new Tuple(1, "what")); 
-		
-	
-		
-//		hashTable = new HashTable(10); 
-//		
-//		for(int i = 0; i < 10; i++) {
-//			Tuple tuple = new Tuple(i, "what"); 
-//			Tuple tuple2 = new Tuple(0, "what"); 
-//			hashTable.add(tuple);
-//			hashTable.add(tuple2);
-//		}
-//		hashTable.remove(new Tuple(0, "what"));
-//		hashTable.remove(new Tuple(0, "what"));
-//		hashTable.remove(new Tuple(0, "what"));
-//		hashTable.remove(new Tuple(0, "what"));
-//		
-//		printHashTable(); 
-//		System.out.println();
-//		System.out.println(hashTable.loadFactor());
-//		System.out.println(hashTable.maxLoad());
-//		System.out.println(hashTable.averageLoad());
-//		System.out.println(hashTable.search(1).toString());
-		
-		
-//		System.out.println(hashTable.numElements());
-//		System.out.println("abc".hashCode());
-//		System.out.println("abc".hashCode());
-//		System.out.println(Math.sqrt(0));
-		
+		System.out.println(fileLocation);
+
+		if(fileLocation.isEmpty()) {
+			throw new Exception("Enter a file location.");
+		}
+
+		String s1 = "";
+		String s2 = "";
+
+		long tStart;
+		long tEnd;
+		long tDelta;
+		double elapsedSeconds;
+
+		BruteForceSimilarity bruteForceSimilarity;
+		HashStringSimilarity hashStringSimilarity;
+		HashCodeSimilarity hashCodeSimilarity;
+
+		String line = "";
+
+		BufferedReader bufferedReader = new BufferedReader(new FileReader(fileLocation + "shak1"));
+		while ((line = bufferedReader.readLine()) != null) {
+			line = line.replaceAll(" ", "")
+						.replaceAll("\t", "")
+						.replaceAll("\\.", "")
+						.replaceAll(",", "")
+						.replaceAll(":", "")
+						.replaceAll(";", "");
+
+			line = line.toLowerCase();
+			s1 += line;
+		}
+
+		bufferedReader.close();
+
+		bufferedReader = new BufferedReader(new FileReader(fileLocation + "shak2"));
+		while ((line = bufferedReader.readLine()) != null) {
+			line = line.replaceAll(" ", "")
+					.replaceAll("\t", "")
+					.replaceAll("\\.", "")
+					.replaceAll(",", "")
+					.replaceAll(":", "")
+					.replaceAll(";", "");
+
+			line = line.toLowerCase();
+			s2 += line;
+		}
+		bufferedReader.close();
+
+		tStart = System.currentTimeMillis();
+		bruteForceSimilarity = new BruteForceSimilarity(s1, s2, 8);
+		System.out.println("Brute Force Similarity: " + bruteForceSimilarity.similarity());
+		tEnd = System.currentTimeMillis();
+		tDelta = tEnd - tStart;
+		elapsedSeconds = tDelta / 1000.0;
+		System.out.println("Elapsed seconds: " + elapsedSeconds);
+
+		tStart = System.currentTimeMillis();
+		hashCodeSimilarity = new HashCodeSimilarity(s1, s2, 8);
+		System.out.println("Hash Code Similarity: " + hashCodeSimilarity.similarity());
+		tEnd = System.currentTimeMillis();
+		tDelta = tEnd - tStart;
+		elapsedSeconds = tDelta / 1000.0;
+		System.out.println("Elapsed seconds: " + elapsedSeconds);
+
+		tStart = System.currentTimeMillis();
+		hashStringSimilarity = new HashStringSimilarity(s1, s2, 8);
+		System.out.println("Hash String Similarity: " + hashStringSimilarity.similarity());
+		tEnd = System.currentTimeMillis();
+		tDelta = tEnd - tStart;
+		elapsedSeconds = tDelta / 1000.0;
+		System.out.println("Elapsed seconds: " + elapsedSeconds);
 	}
+
 	public static void printHashTable() {
 		ArrayList<LinkedList<Tuple>> table = hashTable.getTable(); 
 		for(int i = 0; i < table.size(); i++) {
