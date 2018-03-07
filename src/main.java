@@ -84,23 +84,5 @@ public class main {
 		elapsedSeconds = tDelta / 1000.0;
 		System.out.println("Elapsed seconds: " + elapsedSeconds);
 	}
-
-	public static void printHashTable() {
-		ArrayList<LinkedList<Tuple>> table = hashTable.getTable(); 
-		for(int i = 0; i < table.size(); i++) {
-			System.out.print(i + "   ");
-			LinkedList<Tuple> list = table.get(i); 
-			if(list != null) {
-				for(int j =0; j < list.size(); j++) {
-					Tuple tuple = list.get(j); 
-					System.out.print(tuple.getKey() + ", " + tuple.getValue() + " : ");
-				
-				}
-			}else System.out.print("null");
-
-			System.out.println();
-		}
-	
-	}
 	
 }
