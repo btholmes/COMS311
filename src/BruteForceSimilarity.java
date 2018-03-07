@@ -14,7 +14,7 @@ import java.util.Collections;
 * @author Ben Holmes, Anthony House
 */
 
-public class BruteForceSimilarity
+public class BruteForceSimilarity extends newClass
 {
 	// member fields and other member methods
 	String s1; 
@@ -93,31 +93,37 @@ public class BruteForceSimilarity
 		}
 		
 		String firstString;  
+		String secondString; 
+//		int mid = mainString.length()/2; 
+//		if(mainString.length() %2 == 0) mid -= 1; 
+		
 		for(int i = 0; i <= mainString.length()-length; i++) {
 			firstString = mainString.substring(i, i+ length); 
-			if(s1) addToS1(firstString); 
-			else addToS2(firstString); 
+//			secondString = mainString.substring(mainString.length()-length-1-i, (mainString.length()-length-1-i)+length); 
+			if(s1) {
+				addToS1(firstString); 
+//				addToS1(secondString); 
+			}
+			else {
+				addToS2(firstString); 
+//				addToS2(secondString); 
+			}
 		}
 	}
 
+	@Override
 	public float lengthOfS1()
 	{
-		// implementation
 		float result = 0.0f; 
 		if(s1.length() < length) return 0.0f; 
-//		System.out.println("Number of distinct strings in s1 is " + s1DistinctStrings.size());
-//		System.out.println(s1DistinctStrings.toString());
-//		System.out.println(s1Count.toString());
 		
 		for(String string : s1DistinctStrings) {
 			result += Math.pow(getS1Count(string), 2);  
 		}
-//		System.out.println("Length of s1 before sqrt " + result);
-
 		
 		return (float) Math.sqrt(result); 
 	}
-
+	@Override
 	public float lengthOfS2()
 	{
 		// implementation
@@ -131,7 +137,7 @@ public class BruteForceSimilarity
 		
 		return (float) Math.sqrt(result); 
 	}
-
+	@Override
 	public float similarity()
 	{
 		// implementation

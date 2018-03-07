@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Collections;
+
 // LEAVE THIS FILE IN THE DEFAULT PACKAGE
 //  (i.e., DO NOT add 'package cs311.pa1;' or similar)
 
@@ -13,26 +16,33 @@
 
 public class Tuple
 {
-	// member fields and other member methods
 	int key; 
 	String value; 
+	int occurrences; 
+
 
 	public Tuple(int keyP, String valueP)
 	{
-		// implementation
 		this.key = keyP; 
 		this.value = valueP; 
+		this.occurrences = 1; 
+	}
+	
+	public void increment() {
+		this.occurrences += 1; 
+	}
+	
+	public void decrement() {
+		this.occurrences -= 1; 
 	}
 
 	public int getKey()
 	{
-		// implementation
 		return key; 
 	}
 
 	public String getValue()
 	{
-		// implementation
 		return value; 
 	}
 

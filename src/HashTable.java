@@ -1,9 +1,9 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 // LEAVE THIS FILE IN THE DEFAULT PACKAGE
 //  (i.e., DO NOT add 'package cs311.pa1;' or similar)
@@ -22,8 +22,13 @@ public class HashTable
 {
 	int size = 0; 
 	HashFunction hashFunc; 
+	HashFunction insideHashFunc; 
 	int numOfElements; 
-	ArrayList<LinkedList<Tuple>> hashTable; 
+	ArrayList<ArrayList<LinkedList<Tuple>>> hashTable; 
+	
+	//10067 8641 7001 5701 4001 3001 1901 1009
+	int insideTableSize = 1009; 
+	
 
 	/**
 	 * There has to be a better way to instantiate the ArrayList of new LinkedLists than this for loop
@@ -32,38 +37,20 @@ public class HashTable
 	public HashTable(int size)
 	{
 		hashFunc = new HashFunction(size); 
+		insideHashFunc = new HashFunction(insideTableSize); 
+		
 		this.size = hashFunc.getPrime(); 
 		numOfElements = 0; 
 		
-		hashTable = new ArrayList<LinkedList<Tuple>>(Collections.nCopies(this.size, new LinkedList<Tuple>())); 
-		for(int i = 0; i < this.size; i++) {
-			hashTable.set(i, null);  
-		}
-
+		hashTable = new ArrayList<ArrayList<LinkedList<Tuple>>>(Collections.nCopies(this.size, null)); 
 	}
 	
 	/**
 	 * Method to retrieve the actual table, just for testing, to print out the hash table
 	 * @return
 	 */
-	public ArrayList<LinkedList<Tuple>> getTable(){
+	public ArrayList<ArrayList<LinkedList<Tuple>>> getTable(){
 		return hashTable; 
-	}
-	
-	public void printTable() {
-		System.out.println();
-		for(int i =0; i < hashTable.size(); i++) {
-			System.out.print(i + "  : ");
-			LinkedList<Tuple> list = hashTable.get(i); 
-			if(list != null) {
-				for(int j =0; j < list.size(); j++) {
-					Tuple tuple = list.get(j); 
-					System.out.print(tuple.key + " , " + tuple.value + " - ");
-				}
-			}
-			System.out.println();
-		}
-		System.out.println();
 	}
 
 	/**
@@ -124,14 +111,33 @@ public class HashTable
 	public void add(Tuple t)
 	{
 		int hash = hashFunc.hash(t.getKey()); 
+		int insideHash = insideHashFunc.hash(t.getKey() - hash); 
 		
 		if(hashTable.get(hash) == null) { 
-			hashTable.set(hash, new LinkedList<Tuple>());  
-			hashTable.get(hash).addFirst(t); 
+			hashTable.set(hash, new ArrayList<LinkedList<Tuple>>(Collections.nCopies(insideTableSize,  null)));  
+			hashTable.get(hash).set(insideHash, new LinkedList<Tuple>()); 
+			hashTable.get(hash).get(insideHash).addFirst(t);
+			numOfElements++; 
+		}else if(hashTable.get(hash).get(insideHash) == null) {
+			hashTable.get(hash).set(insideHash, new LinkedList<Tuple>()); 
+			hashTable.get(hash).get(insideHash).addFirst(t);
+			numOfElements++; 
 		}
-		else hashTable.get(hash).addFirst(t); 
-
-		numOfElements++; 		
+		else{
+			LinkedList<Tuple> linkedTuples = hashTable.get(hash).get(insideHash); 
+			boolean found = false; 
+			for(int i = 0; i < linkedTuples.size(); i++) {
+				Tuple tuple = linkedTuples.get(i); 
+				if(t.equals(tuple)) {
+					hashTable.get(hash).get(insideHash).get(i).increment();
+					found = true; 
+					break; 
+				}
+			}
+			if(!found) {
+				hashTable.get(hash).get(insideHash).addFirst(t); 
+			}
+		}
 	}
 
 	/**
@@ -143,21 +149,23 @@ public class HashTable
 	{
 		List<Tuple> result = new ArrayList<Tuple>(); 
 		int hash = hashFunc.hash(k); 
+		int insideHash = insideHashFunc.hash(k-hash); 
 		
 		if(hashTable.get(hash) == null) return (ArrayList<Tuple>) result; 
 		
-		result.addAll(hashTable.get(hash)); 
-		
-		
-//		Iterator<Tuple> it = hashTable.get(hash).iterator(); 
-//		while(it.hasNext()) {
-//			Tuple tuple = it.next(); 
-//			if(tuple.key == k) {
-//				result.add(tuple); 
-//			}
-//		}
-		
-		
+
+		else if(hashTable.get(hash).get(insideHash) == null) {
+			return (ArrayList<Tuple>) result; 
+		}
+		else {
+			Iterator<Tuple> it = hashTable.get(hash).get(insideHash).iterator();  
+			while(it.hasNext()) {
+				Tuple tuple = it.next(); 
+				if(tuple.key == k) {
+					result.add(tuple); 
+				}
+			}	
+		}		
 		return (ArrayList<Tuple>) result; 
 	}
 
@@ -169,16 +177,23 @@ public class HashTable
 	public int search(Tuple t)
 	{
 		int hash = hashFunc.hash(t.getKey()); 
+		int insideHash = insideHashFunc.hash(t.getKey() - hash); 
 		int result = 0; 
 		
 		if(hashTable.get(hash) == null) return 0; 
-		
-		Iterator<Tuple> it = hashTable.get(hash).iterator(); 
-		while(it.hasNext()) {
-			if(it.next().equals(t)) {
-				result++; 
+		else if(hashTable.get(hash).get(insideHash) == null) {
+			return 0; 
+		}else {
+			Iterator<Tuple> it = hashTable.get(hash).get(insideHash).iterator(); 
+			while(it.hasNext()) {
+				Tuple tuple = (Tuple) it.next(); 
+				if(tuple.equals(t)) {
+					result += tuple.occurrences; 
+				}
 			}
 		}
+		
+
 		return result; 
 	}
 
@@ -189,14 +204,24 @@ public class HashTable
 	public void remove(Tuple t)
 	{	
 		int hash = hashFunc.hash(t.getKey()); 
-		if(hashTable.get(hash) == null) return; 
+		int insideHash = insideHashFunc.hash(t.getKey() - hash); 
 		
-		for(int i =0; i < hashTable.get(hash).size(); i++) {
-			if(hashTable.get(hash).get(i).equals(t)) {
-				hashTable.get(hash).remove(i); 
-				numOfElements--; 
-				return; 
+		if(hashTable.get(hash) == null) return; 
+		else if(hashTable.get(hash).get(insideHash) == null) {
+			return; 
+		}
+		else {
+			for(int i = 0; i < hashTable.get(hash).get(insideHash).size(); i++) {
+				if(hashTable.get(hash).get(insideHash).get(i).equals(t)) {
+					hashTable.get(hash).get(insideHash).get(i).decrement(); 
+					if(hashTable.get(hash).get(insideHash).get(i).occurrences == 0) {
+						hashTable.get(hash).get(insideHash).set(i, null); 
+					}
+					numOfElements--; 
+				}
 			}
 		}
 	}
+	
+	
 }

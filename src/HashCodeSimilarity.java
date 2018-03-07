@@ -13,12 +13,12 @@ import java.util.ArrayList;
 * @author Ben Holmes, Anthony House
 */
 
-public class HashCodeSimilarity
+public class HashCodeSimilarity extends newClass
 {
 	private String s1; 
 	private String s2; 
 	private int length; 
-	private int prime = 3; 
+	private int prime = 31; 
 	
 	private HashTable S; 
 	private ArrayList<Integer> s1DistinctHashes; 
@@ -27,19 +27,24 @@ public class HashCodeSimilarity
 	private ArrayList<Integer> s2DistinctHashes; 
 	
 	private ArrayList<Integer> distinctHashes; 
+	private HashTable U; 
 
 	public HashCodeSimilarity(String s1, String s2, int sLength)
 	{
 		this.s1 = s1; 
 		this.s2 = s2; 
 		this.length = sLength; 
+		//1009 104729  10067
+		int tableSize = 1009; 
 		
-		S = new HashTable(s1.length());
+		S = new HashTable(tableSize);
 		s1DistinctHashes = new ArrayList<Integer>(); 
-		T = new HashTable(s2.length()); 
+		
+		T = new HashTable(tableSize); 
 		s2DistinctHashes = new ArrayList<Integer>(); 
 		
 		distinctHashes = new ArrayList<Integer>(); 
+		U = new HashTable(tableSize); 
 		
 		hashItOut(s1, true); 
 		hashItOut(s2, false); 
@@ -54,14 +59,14 @@ public class HashCodeSimilarity
 	}
 	
 	public void addToS1(String string, int hash) {
-
 		Tuple tuple = new Tuple(hash, string);  
 		
 		if(S.search(tuple) == 0) s1DistinctHashes.add(hash); 
 		
 		S.add(tuple);
 		
-		if(!distinctHashes.contains(hash)) {
+		if(U.search(tuple) == 0) {
+			U.add(tuple);
 			distinctHashes.add(hash); 
 		}
 		
@@ -74,23 +79,25 @@ public class HashCodeSimilarity
 		
 		T.add(tuple); 
 		
-		if(!distinctHashes.contains(hash)) {
+		if(U.search(tuple) == 0) {
+			U.add(tuple);
 			distinctHashes.add(hash); 
 		}
 	}
 	
 	public int convertToInt(char ch) {
-		return ch - 96; 
+		return ch; 
 	}
 	
-	public int computeHash(String string) {
-		int result = 0; 
-		
-		for(int i = 0; i < length; i++) {
-			result += convertToInt(string.charAt(i)) * Math.pow(prime, i); 
-		}
-		
-		return result; 
+	public long computeHash(String string) {
+//		long result = 0; 
+//		
+//		for(int i = 0; i < length; i++) {
+//			result += convertToInt(string.charAt(i)) * Math.pow(prime, i); 
+//		}
+//		
+//		return result; 
+		return string.hashCode(); 
 	}
 	
 	/**
@@ -108,22 +115,32 @@ public class HashCodeSimilarity
 		}
 		
 		String firstString = mainString.substring(0, length); 
-		int hash = computeHash(firstString); 
-		
-		for(int i = 0; i <= mainString.length()-length-1; i++) {
-//			String string = mainString.substring(i, i+length); 
-//			if(s1) addToS1(string, string.hashCode()); 
-//			else addToS2(string, string.hashCode()); 
-			if(s1) addToS1(firstString, hash); 
-			else addToS2(firstString, hash); 
-			firstString = mainString.substring(i+1, i+1+length); 
-			hash -= convertToInt(mainString.charAt(i)); 
-			hash = hash/prime; 
-			hash += mainString.charAt(i+length) * Math.pow(prime, length -1); 
+	
+		for(int i = 0; i <= mainString.length()-length; i++) {
+			String string = mainString.substring(i, i + length); 
+			int hash = string.hashCode(); 
+			if(s1) {
+				addToS1(string, hash); 
+			}
+			else addToS2(string, hash); 
+//			firstString = mainString.substring(i+1, i+1+length); 
+//			hash -= convertToInt(mainString.charAt(i)); 
+//			hash = hash/prime; 
+//			hash += mainString.charAt(i+length) * Math.pow(prime, length -1); 
 		}
+		
+//		firstString = mainString.substring(mainString.length() - length, mainString.length()); 
+//		hash = computeHash(firstString); 
+//		if(s1) {
+//			addToS1(firstString, hash); 
+////			System.out.println(firstString);
+//		}
+//		else addToS2(firstString, hash); 
+		
+		
 	}
 
-	
+	@Override
 	public float lengthOfS1()
 	{
 		float result = 0.0f; 
@@ -131,12 +148,15 @@ public class HashCodeSimilarity
 		
 		for(Integer hash : s1DistinctHashes) {
 			ArrayList<Tuple> list = S.search(hash); 
-				result += Math.pow(list.size(), 2);  
+			if(list.size() > 0) {
+				result += Math.pow(list.get(0).occurrences, 2); 
+			}
 		}
 		
 		return (float) Math.sqrt(result); 
 	}
 
+	@Override
 	public float lengthOfS2()
 	{
 		float result = 0.0f; 
@@ -144,13 +164,17 @@ public class HashCodeSimilarity
 		
 		for(Integer hash : s2DistinctHashes) {
 			ArrayList<Tuple> list = T.search(hash); 
-				result += Math.pow(list.size(), 2);  
+			if(list.size() > 0) {
+				result += Math.pow(list.get(0).occurrences, 2); 
+			}
 		}
+		
 		
 		return (float) Math.sqrt(result); 
 		
 	}
 
+	@Override
 	public float similarity()
 	{
 		float result = 0.0f; 
@@ -159,7 +183,15 @@ public class HashCodeSimilarity
 		for(Integer hash : distinctHashes) {
 			ArrayList<Tuple> list1 = S.search(hash); 
 			ArrayList<Tuple> list2 = T.search(hash); 
-			topSummation += (list1.size() * list2.size()); 
+			if(list1.size() > 0 && list2.size()>0) {
+				if(list1.size() > 1 || list2.size() > 1) {
+					System.out.println(list1.size() + "  " + list2.size());
+				}
+				Tuple tuple1 = list1.get(0); 
+				Tuple tuple2 = list2.get(0); 
+				topSummation += (tuple1.occurrences * tuple2.occurrences); 
+			}
+		
 		}
 		
 		float denominator = (this.lengthOfS1() * this.lengthOfS2()); 

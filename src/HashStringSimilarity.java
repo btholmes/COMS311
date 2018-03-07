@@ -14,12 +14,13 @@ import java.util.LinkedList;
 * @author Ben Holmes, Anthony House
 */
 
-public class HashStringSimilarity
+public class HashStringSimilarity extends newClass
 {
 
 	private String s1; 
 	private String s2; 
 	private int length; 
+	private int prime = 31; 
 	
 	private HashTable S; 
 	private ArrayList<String> s1DistinctStrings; 
@@ -28,6 +29,7 @@ public class HashStringSimilarity
 	private ArrayList<String> s2DistinctStrings; 
 	
 	private ArrayList<String> distinctStrings; 
+	private HashTable U; 
 
 	public HashStringSimilarity(String s1, String s2, int sLength)
 	{
@@ -36,42 +38,63 @@ public class HashStringSimilarity
 		this.s2 = s2; 
 		this.length = sLength; 
 		
-		S = new HashTable(s1.length());
+		//1009 104729  10067
+		int tableSize = 1009; 
+		
+		S = new HashTable(tableSize);
 		s1DistinctStrings = new ArrayList<String>(); 
-		T = new HashTable(s2.length()); 
+		T = new HashTable(tableSize); 
 		s2DistinctStrings = new ArrayList<String>(); 
 		
 		distinctStrings = new ArrayList<String>(); 
+		U = new HashTable(tableSize); 
+		
 		
 		hashItOut(s1, true); 
 		hashItOut(s2, false); 
 		
 	}
-	public void addToS1(String string) {
-		int key = string.hashCode(); 
+
+	public void addToS1(String string, int key) {
 		Tuple tuple = new Tuple(key, string);  
 		
 		if(S.search(tuple) == 0) s1DistinctStrings.add(string); 
 		
 		S.add(tuple);
 		
-		if(!distinctStrings.contains(string)) {
+		if(U.search(tuple) == 0) {
+			U.add(tuple);
 			distinctStrings.add(string); 
 		}
-		
 	}
-	public void addToS2(String string) {
-		int key = string.hashCode(); 
+	public void addToS2(String string, int key) {
 		Tuple tuple = new Tuple(key, string); 
 		
 		if(T.search(tuple) == 0) s2DistinctStrings.add(string); 
 		
 		T.add(tuple); 
 		
-		if(!distinctStrings.contains(string)) {
+		if(U.search(tuple) == 0) {
+			U.add(tuple);
 			distinctStrings.add(string); 
 		}
 	}
+	
+	public int convertToInt(char ch) {
+		return ch; 
+	}
+	
+	public int computeHash(String string) {
+//		long result = 0; 
+//		
+//		for(int i = 0; i < length; i++) {
+//			result += convertToInt(string.charAt(i)) * Math.pow(prime, i); 
+//		}
+//		
+//		return result; 
+		return string.hashCode(); 
+	}
+	
 	/**
 	 * Function generates hashes for each shingle, and adds them to appropriate set, s1 or s2. 
 	 * @param mainString
@@ -82,18 +105,31 @@ public class HashStringSimilarity
 			return; 
 		}
 		if(mainString.length() == length) {
-			if(s1) addToS1(mainString); 
-			else addToS2(mainString); 
+			if(s1) addToS1(mainString, computeHash(mainString)); 
+			else addToS2(mainString, computeHash(mainString)); 
 		}
 		
+//		String firstString = mainString.substring(0, length); 
+//		int hash = computeHash(firstString); 
+		
 		String firstString;  
+		int hash; 
 		for(int i = 0; i <= mainString.length()-length; i++) {
 			firstString = mainString.substring(i, i+ length); 
-			if(s1) addToS1(firstString); 
-			else addToS2(firstString); 
+			hash = computeHash(firstString); 
+			if(s1) addToS1(firstString, hash); 
+			else addToS2(firstString, hash); 
+			
+//			if(s1) addToS1(firstString, hash); 
+//			else addToS2(firstString, hash); 
+//			firstString = mainString.substring(i+1, i+1+length); 
+//			hash -= convertToInt(mainString.charAt(i)); 
+//			hash = hash/prime; 
+//			hash += mainString.charAt(i+length) * Math.pow(prime, length -1);
 		}
 	}
 
+	@Override
 	public float lengthOfS1()
 	{
 		float result = 0.0f; 
@@ -107,6 +143,7 @@ public class HashStringSimilarity
 		return (float) Math.sqrt(result); 
 	}
 
+	@Override
 	public float lengthOfS2()
 	{
 		float result = 0.0f; 
@@ -116,11 +153,10 @@ public class HashStringSimilarity
 			Tuple tuple = new Tuple(string.hashCode(), string); 
 			result += Math.pow(T.search(tuple), 2);  
 		}
-		
 		return (float) Math.sqrt(result); 
-		
 	}
 
+	@Override
 	public float similarity()
 	{
 		float result = 0.0f; 
