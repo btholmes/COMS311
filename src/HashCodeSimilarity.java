@@ -34,7 +34,7 @@ public class HashCodeSimilarity extends newClass
 		this.s1 = s1; 
 		this.s2 = s2; 
 		this.length = sLength; 
-		//1009 104729  10067
+		//1009 104729  10067 109
 		int tableSize = 1009; 
 		
 		S = new HashTable(tableSize);
@@ -85,23 +85,37 @@ public class HashCodeSimilarity extends newClass
 		}
 	}
 	
-	public int convertToInt(char ch) {
-		return ch; 
+	public static int power(int k, int m) {
+		int result = 0; 
+		if(m == 0) {
+			return 1; 
+		}
+		else if(m %2 == 0) {
+			result = power(k, m/2); 
+			return result * result; 
+
+		}
+		else {
+			result = power(k,m/2); 
+			return result*result*k; 
+		}
 	}
 	
-	public long computeHash(String string) {
-//		long result = 0; 
-//		
-//		for(int i = 0; i < length; i++) {
-//			result += convertToInt(string.charAt(i)) * Math.pow(prime, i); 
-//		}
-//		
-//		return result; 
-		return string.hashCode(); 
+	
+	public int computeHash(String string) {
+		int result = 0; 
+		
+		for(int i = 0; i < length; i++) {
+			result += string.charAt(i) * power(prime, i); 
+		}
+		return result; 
 	}
 	
 	/**
-	 * Uses Roll-over hashing method
+	 * Just a note, we chose not to use roll over hashing because due to overflow, it results in way too many incorrect hashes. 
+	 * If we would have been allowed to use a long instead of an int, we would have used rollover with much better accurracy, 
+	 * but because we could only store an int value, we chose accuracy over the speed improvement. 
+	 * 
 	 * @param mainString
 	 * @param s1
 	 */
@@ -110,34 +124,26 @@ public class HashCodeSimilarity extends newClass
 			return; 
 		}
 		if(mainString.length() == length) {
-			if(s1) addToS1(mainString, mainString.hashCode()); 
-			else addToS2(mainString, mainString.hashCode()); 
+			if(s1) addToS1(mainString, computeHash(mainString)); 
+			else addToS2(mainString, computeHash(mainString)); 
 		}
 		
-		String firstString = mainString.substring(0, length); 
-	
+		String firstString = "";  
+		int hash = 0;
 		for(int i = 0; i <= mainString.length()-length; i++) {
-			String string = mainString.substring(i, i + length); 
-			int hash = string.hashCode(); 
-			if(s1) {
-				addToS1(string, hash); 
-			}
-			else addToS2(string, hash); 
-//			firstString = mainString.substring(i+1, i+1+length); 
-//			hash -= convertToInt(mainString.charAt(i)); 
+			firstString = mainString.substring(i, i+ length); 
+			hash = computeHash(firstString); 
+			if(s1) addToS1(firstString, hash); 
+			else addToS2(firstString, hash); 
+//			hash -= mainString.charAt(i); 
 //			hash = hash/prime; 
-//			hash += mainString.charAt(i+length) * Math.pow(prime, length -1); 
+//			hash += mainString.charAt(i+length) * power(prime, length -1);
 		}
-		
-//		firstString = mainString.substring(mainString.length() - length, mainString.length()); 
-//		hash = computeHash(firstString); 
 //		if(s1) {
 //			addToS1(firstString, hash); 
-////			System.out.println(firstString);
 //		}
 //		else addToS2(firstString, hash); 
-		
-		
+			
 	}
 
 	@Override
@@ -149,7 +155,9 @@ public class HashCodeSimilarity extends newClass
 		for(Integer hash : s1DistinctHashes) {
 			ArrayList<Tuple> list = S.search(hash); 
 			if(list.size() > 0) {
-				result += Math.pow(list.get(0).occurrences, 2); 
+				for(Tuple tuple : list) {
+					result += power(tuple.occurrences, 2); 
+				}
 			}
 		}
 		
@@ -165,33 +173,34 @@ public class HashCodeSimilarity extends newClass
 		for(Integer hash : s2DistinctHashes) {
 			ArrayList<Tuple> list = T.search(hash); 
 			if(list.size() > 0) {
-				result += Math.pow(list.get(0).occurrences, 2); 
+				for(Tuple tuple : list) {
+					result += power(tuple.occurrences, 2); 
+				} 
 			}
-		}
-		
-		
+		}	
 		return (float) Math.sqrt(result); 
-		
 	}
 
 	@Override
 	public float similarity()
 	{
 		float result = 0.0f; 
-		long topSummation = 0; 
+		float topSummation = 0.0f; 
 		
 		for(Integer hash : distinctHashes) {
 			ArrayList<Tuple> list1 = S.search(hash); 
 			ArrayList<Tuple> list2 = T.search(hash); 
 			if(list1.size() > 0 && list2.size()>0) {
-				if(list1.size() > 1 || list2.size() > 1) {
-					System.out.println(list1.size() + "  " + list2.size());
+				int s1Occurrences = 0; 
+				int s2Occurrences = 0; 
+				for(Tuple tuple : list1) {
+					s1Occurrences += tuple.occurrences; 
 				}
-				Tuple tuple1 = list1.get(0); 
-				Tuple tuple2 = list2.get(0); 
-				topSummation += (tuple1.occurrences * tuple2.occurrences); 
+				for(Tuple tuple : list2) {
+					s2Occurrences += tuple.occurrences; 
+				}
+				topSummation += (s1Occurrences * s2Occurrences); 
 			}
-		
 		}
 		
 		float denominator = (this.lengthOfS1() * this.lengthOfS2()); 
