@@ -49,10 +49,8 @@ public class HashStringSimilarity extends newClass
 		distinctStrings = new ArrayList<String>(); 
 		U = new HashTable(tableSize); 
 		
-		
 		hashItOut(s1, true); 
 		hashItOut(s2, false); 
-		
 	}
 
 	public void addToS1(String string, int key) {
@@ -79,20 +77,33 @@ public class HashStringSimilarity extends newClass
 			distinctStrings.add(string); 
 		}
 	}
+
 	
-	public int convertToInt(char ch) {
-		return ch; 
+	public static int power(int k, int m) {
+		int result = 0; 
+		if(m == 0) {
+			return 1; 
+		}
+		else if(m %2 == 0) {
+			result = power(k, m/2); 
+			return result * result; 
+
+		}
+		else {
+			result = power(k,m/2); 
+			return result*result*k; 
+		}
 	}
 	
+//	2147483647
 	public int computeHash(String string) {
-//		long result = 0; 
-//		
-//		for(int i = 0; i < length; i++) {
-//			result += convertToInt(string.charAt(i)) * Math.pow(prime, i); 
-//		}
-//		
-//		return result; 
-		return string.hashCode(); 
+		int result = 0; 
+		
+		for(int i = 0; i < length; i++) {
+			result += string.charAt(i) * power(prime, i); 
+		}
+		return result; 
+//		return string.hashCode(); 
 	}
 	
 	/**
@@ -109,24 +120,24 @@ public class HashStringSimilarity extends newClass
 			else addToS2(mainString, computeHash(mainString)); 
 		}
 		
-//		String firstString = mainString.substring(0, length); 
-//		int hash = computeHash(firstString); 
-		
-		String firstString;  
-		int hash; 
-		for(int i = 0; i <= mainString.length()-length; i++) {
+		String firstString = "";  
+		int hash = 0; 
+		for(int i = 0; i <= mainString.length()-length-1; i++) {
 			firstString = mainString.substring(i, i+ length); 
 			hash = computeHash(firstString); 
 			if(s1) addToS1(firstString, hash); 
 			else addToS2(firstString, hash); 
-			
-//			if(s1) addToS1(firstString, hash); 
-//			else addToS2(firstString, hash); 
-//			firstString = mainString.substring(i+1, i+1+length); 
-//			hash -= convertToInt(mainString.charAt(i)); 
-//			hash = hash/prime; 
-//			hash += mainString.charAt(i+length) * Math.pow(prime, length -1);
+			firstString = mainString.substring(i+1, i+1+length); 
+			hash -= mainString.charAt(i); 
+			hash = hash/prime; 
+			hash += mainString.charAt(i+length) * power(prime, length -1);
 		}
+		firstString = mainString.substring(mainString.length() - length, mainString.length()); 
+		hash = computeHash(firstString); 
+		if(s1) {
+			addToS1(firstString, hash); 
+		}
+		else addToS2(firstString, hash); 
 	}
 
 	@Override
@@ -135,12 +146,15 @@ public class HashStringSimilarity extends newClass
 		float result = 0.0f; 
 		if(s1.length() < length) return 0.0f; 
 		
+//		System.out.println("Hash s1 distinct " + s1DistinctStrings);
 		for(String string : s1DistinctStrings) {
-			Tuple tuple = new Tuple(string.hashCode(), string); 
-			result += Math.pow(S.search(tuple), 2);  
+			Tuple tuple = new Tuple(computeHash(string), string); 
+			result += power(S.search(tuple), 2);  
 		}
 		
-		return (float) Math.sqrt(result); 
+		result = (float) Math.sqrt(result); 
+//		System.out.println("Hash string s1 " + result);
+		return result; 
 	}
 
 	@Override
@@ -149,11 +163,15 @@ public class HashStringSimilarity extends newClass
 		float result = 0.0f; 
 		if(s2.length() < length) return 0.0f; 
 		
+//		System.out.println("Hash s2 Distinct " + s2DistinctStrings);
+		
 		for(String string : s2DistinctStrings) {
-			Tuple tuple = new Tuple(string.hashCode(), string); 
-			result += Math.pow(T.search(tuple), 2);  
+			Tuple tuple = new Tuple(computeHash(string), string); 
+			result += power(T.search(tuple), 2);  
 		}
-		return (float) Math.sqrt(result); 
+		result = (float) Math.sqrt(result); 
+//		System.out.println("Hash string s2 " + result);
+		return result; 
 	}
 
 	@Override
@@ -162,8 +180,10 @@ public class HashStringSimilarity extends newClass
 		float result = 0.0f; 
 		long topSummation = 0; 
 		
+//		System.out.println("Hash Distinct strings " + distinctStrings);
+		
 		for(String string : distinctStrings) {
-			Tuple tuple = new Tuple(string.hashCode(), string); 
+			Tuple tuple = new Tuple(computeHash(string), string); 
 			topSummation += (S.search(tuple) * T.search(tuple)); 
 		}
 		
