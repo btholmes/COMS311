@@ -13,7 +13,7 @@ import java.util.ArrayList;
 * @author Ben Holmes, Anthony House
 */
 
-public class HashCodeSimilarity extends newClass
+public class HashCodeSimilarity 
 {
 	private String s1; 
 	private String s2; 
@@ -146,7 +146,6 @@ public class HashCodeSimilarity extends newClass
 			
 	}
 
-	@Override
 	public float lengthOfS1()
 	{
 		float result = 0.0f; 
@@ -164,7 +163,6 @@ public class HashCodeSimilarity extends newClass
 		return (float) Math.sqrt(result); 
 	}
 
-	@Override
 	public float lengthOfS2()
 	{
 		float result = 0.0f; 
@@ -181,7 +179,6 @@ public class HashCodeSimilarity extends newClass
 		return (float) Math.sqrt(result); 
 	}
 
-	@Override
 	public float similarity()
 	{
 		float result = 0.0f; 

@@ -3,7 +3,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 // LEAVE THIS FILE IN THE DEFAULT PACKAGE
 //  (i.e., DO NOT add 'package cs311.pa1;' or similar)
@@ -24,10 +23,14 @@ public class HashTable
 	HashFunction hashFunc; 
 	HashFunction insideHashFunc; 
 	int numOfElements; 
+	ArrayList<Integer> loads; 
+
+	
 	ArrayList<ArrayList<LinkedList<Tuple>>> hashTable; 
 	
-	//10067 8641 7001 5701 4001 3001 1901 1009
+	//10067 8641 7001 5701 4001 3001 1901 1009 409 109
 	int insideTableSize = 1009; 
+
 	
 
 	/**
@@ -40,6 +43,9 @@ public class HashTable
 		insideHashFunc = new HashFunction(insideTableSize); 
 		
 		this.size = hashFunc.getPrime(); 
+		
+		loads = new ArrayList<Integer>(Collections.nCopies(this.size, 0)); 
+
 		numOfElements = 0; 
 		
 		hashTable = new ArrayList<ArrayList<LinkedList<Tuple>>>(Collections.nCopies(this.size, null)); 
@@ -55,15 +61,11 @@ public class HashTable
 
 	/**
 	 * 
-	 * @return the maximum LinkedList size stored in the hashTable ArrayList. 
+	 * @return the maximum list size stored in the hashTable ArrayList. 
 	 */
 	public int maxLoad()
 	{
-		int max = 0; 
-		for(int i =0; i < hashTable.size(); i++) {
-			if(hashTable.get(i) != null) max = Math.max(max,  hashTable.get(i).size()); 
-		}
-		return max; 
+		return Collections.max(loads); 
 	}
 
 	/**
@@ -73,14 +75,16 @@ public class HashTable
 	public float averageLoad()
 	{
 		int nonNullCells = 0; 
-		for(int i =0; i < hashTable.size(); i++) {
-			if(hashTable.get(i) != null) {
+		int summationOfListSizes = 0; 
+		for(int i =0; i < loads.size(); i++) {
+			if(loads.get(i) > 0) {
 				nonNullCells++; 
+				summationOfListSizes += loads.get(i); 
 			}
 		}
-		if(nonNullCells == 0) return 0; 
+		if(nonNullCells == 0 || summationOfListSizes == 0) return 0; 
 		
-		return numOfElements/nonNullCells; 
+		return summationOfListSizes/nonNullCells; 
 	}
 
 	public int size()
@@ -88,6 +92,10 @@ public class HashTable
 		return this.size; 
 	}
 
+	/**
+	 * Return the number of distinct elements in table
+	 * @return
+	 */
 	public int numElements()
 	{
 		return this.numOfElements; 
@@ -136,8 +144,10 @@ public class HashTable
 			}
 			if(!found) {
 				hashTable.get(hash).get(insideHash).addFirst(t); 
+				numOfElements++; 
 			}
 		}
+		loads.set(hash, loads.get(hash) + 1); 
 	}
 
 	/**
@@ -191,8 +201,7 @@ public class HashTable
 					result += tuple.occurrences; 
 				}
 			}
-		}
-		
+		}	
 
 		return result; 
 	}
@@ -214,10 +223,12 @@ public class HashTable
 			for(int i = 0; i < hashTable.get(hash).get(insideHash).size(); i++) {
 				if(hashTable.get(hash).get(insideHash).get(i).equals(t)) {
 					hashTable.get(hash).get(insideHash).get(i).decrement(); 
+					loads.set(hash, loads.get(hash) - 1); 
+					
 					if(hashTable.get(hash).get(insideHash).get(i).occurrences == 0) {
 						hashTable.get(hash).get(insideHash).set(i, null); 
+						numOfElements--; 
 					}
-					numOfElements--; 
 				}
 			}
 		}

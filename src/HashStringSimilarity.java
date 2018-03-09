@@ -14,7 +14,7 @@ import java.util.LinkedList;
 * @author Ben Holmes, Anthony House
 */
 
-public class HashStringSimilarity extends newClass
+public class HashStringSimilarity 
 {
 
 	private String s1; 
@@ -100,10 +100,9 @@ public class HashStringSimilarity extends newClass
 		int result = 0; 
 		
 		for(int i = 0; i < length; i++) {
-			result += string.charAt(i) * power(prime, i); 
+			result += Math.abs(string.charAt(i)) * Math.abs(power(prime, i)); 
 		}
-		return result; 
-//		return string.hashCode(); 
+		return Math.abs(result); 
 	}
 	
 	/**
@@ -122,65 +121,46 @@ public class HashStringSimilarity extends newClass
 		
 		String firstString = "";  
 		int hash = 0; 
-		for(int i = 0; i <= mainString.length()-length-1; i++) {
+		for(int i = 0; i <= mainString.length()-length; i++) {
 			firstString = mainString.substring(i, i+ length); 
 			hash = computeHash(firstString); 
 			if(s1) addToS1(firstString, hash); 
 			else addToS2(firstString, hash); 
-			firstString = mainString.substring(i+1, i+1+length); 
-			hash -= mainString.charAt(i); 
-			hash = hash/prime; 
-			hash += mainString.charAt(i+length) * power(prime, length -1);
 		}
-		firstString = mainString.substring(mainString.length() - length, mainString.length()); 
-		hash = computeHash(firstString); 
-		if(s1) {
-			addToS1(firstString, hash); 
-		}
-		else addToS2(firstString, hash); 
 	}
 
-	@Override
 	public float lengthOfS1()
 	{
 		float result = 0.0f; 
 		if(s1.length() < length) return 0.0f; 
 		
-//		System.out.println("Hash s1 distinct " + s1DistinctStrings);
 		for(String string : s1DistinctStrings) {
 			Tuple tuple = new Tuple(computeHash(string), string); 
 			result += power(S.search(tuple), 2);  
 		}
 		
 		result = (float) Math.sqrt(result); 
-//		System.out.println("Hash string s1 " + result);
 		return result; 
 	}
 
-	@Override
 	public float lengthOfS2()
 	{
 		float result = 0.0f; 
 		if(s2.length() < length) return 0.0f; 
-		
-//		System.out.println("Hash s2 Distinct " + s2DistinctStrings);
-		
+				
 		for(String string : s2DistinctStrings) {
 			Tuple tuple = new Tuple(computeHash(string), string); 
 			result += power(T.search(tuple), 2);  
 		}
 		result = (float) Math.sqrt(result); 
-//		System.out.println("Hash string s2 " + result);
 		return result; 
 	}
 
-	@Override
 	public float similarity()
 	{
 		float result = 0.0f; 
 		long topSummation = 0; 
 		
-//		System.out.println("Hash Distinct strings " + distinctStrings);
 		
 		for(String string : distinctStrings) {
 			Tuple tuple = new Tuple(computeHash(string), string); 

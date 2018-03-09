@@ -18,7 +18,7 @@ public class Tuple
 {
 	int key; 
 	String value; 
-	int occurrences; 
+	int occurrences;
 
 
 	public Tuple(int keyP, String valueP)
@@ -48,7 +48,6 @@ public class Tuple
 
 	public boolean equals(Tuple t)
 	{
-		// implementation
 		boolean result = false; 
 		if(t.key == this.key && t.value.equals(this.value)) {
 			result = true; 
