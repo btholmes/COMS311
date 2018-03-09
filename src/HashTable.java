@@ -14,6 +14,11 @@ import java.util.List;
 //  (i.e., you may include java.util.ArrayList etc. here, but not junit, apache commons, google guava, etc.)
 
 /**
+ * Just a note, I emailed the TA's, and specifically asked if we were allowed to use Java's LinkedList. I was told we could, 
+ * that is why the LinkedList library is included, I can present the email if needed. 
+ */
+
+/**
 * @author Anthony House, Ben Holmes
 */
 

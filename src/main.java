@@ -27,16 +27,16 @@ public class main {
           String s2 = ""; 
           line = br.readLine(); 
           while(line != null){  
-        	  	line = line.toLowerCase(); 
+//        	  	line = line.toLowerCase(); 
 //        	  	line = line.replaceAll("[^A-Za-z0-9]", ""); 
-        	  	line.replaceAll(" ", "")
+        	  	line = line.replaceAll(" ", "")
                 .replaceAll("\t", "")
                 .replaceAll("\\.", "")
                 .replaceAll(",", "")
                 .replaceAll(":", "")
                 .replaceAll(";", "");
         	  	
-        	  	
+        	  	line.toLowerCase(); 
         	  	s1 += line; 
         	  	line = br.readLine(); 
           }  
@@ -44,14 +44,16 @@ public class main {
           br = new BufferedReader(test2);
           line = br.readLine(); 
           while(line != null) {
-        		line = line.toLowerCase(); 
+//        		line = line.toLowerCase(); 
 //        	  	line = line.replaceAll("[^A-Za-z0-9]", ""); 
-        		line.replaceAll(" ", "")
+        		line = line.replaceAll(" ", "")
                 .replaceAll("\t", "")
                 .replaceAll("\\.", "")
                 .replaceAll(",", "")
                 .replaceAll(":", "")
                 .replaceAll(";", "");
+        		line.toLowerCase(); 
+        		
         	  	s2 += line; 
         	  	line = br.readLine(); 
           }
@@ -60,6 +62,8 @@ public class main {
           test1.close();   
           test2.close(); 
 		
+//          s1 = "aroseisaroseisarose"; 
+//          s2 = "aroseisaroseisarose"; 
           
     	    Long time = System.currentTimeMillis(); 
 //    		BruteForceSimilarity brute = new BruteForceSimilarity(s1, s2, 8); 

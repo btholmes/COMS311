@@ -1,3 +1,2 @@
-Team Members:
-- Ben Holmes
-- Anthony House
+Ben Holmes 
+Anthony House
