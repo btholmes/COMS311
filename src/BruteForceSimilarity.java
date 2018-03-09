@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Collections;
 
 // LEAVE THIS FILE IN THE DEFAULT PACKAGE
 //  (i.e., DO NOT add 'package cs311.pa1;' or similar)
@@ -17,25 +16,24 @@ import java.util.Collections;
 public class BruteForceSimilarity extends newClass
 {
 	// member fields and other member methods
-	String s1; 
-	String s2; 
-	int length; 
-	
+	private String s1;
+	private String s2;
+	private int shingleLength;
 
-	public static ArrayList<String> s1DistinctStrings = new ArrayList<String>(); 
-	public static ArrayList<String> s2DistinctStrings = new ArrayList<String>(); 
-	
-	public static ArrayList<Integer> S = new ArrayList<Integer>(); 
-	public static ArrayList<Integer> T = new ArrayList<Integer>(); 
-	
-	public static ArrayList<String> distinctStrings = new ArrayList<String>(); 
+	private static ArrayList<String> s1DistinctStrings = new ArrayList<>();
+	private static ArrayList<String> s2DistinctStrings = new ArrayList<>();
+
+	private static ArrayList<Integer> S = new ArrayList<>();
+	private static ArrayList<Integer> T = new ArrayList<>();
+
+	private static ArrayList<String> distinctStrings = new ArrayList<>();
 
 	public BruteForceSimilarity(String s1, String s2, int sLength)
 	{
 		// implementation
 		this.s1 = s1; 
 		this.s2 = s2; 
-		this.length = sLength; 
+		this.shingleLength = sLength;
 		
 		hashItOut(s1, true); 
 		hashItOut(s2, false);  
@@ -84,29 +82,23 @@ public class BruteForceSimilarity extends newClass
 	
 
 	public void hashItOut(String mainString, boolean s1) {
-		if(mainString.length() < length) {
+		if(mainString.length() < shingleLength) {
 			return; 
 		}
-		if(mainString.length() == length) {
+		if(mainString.length() == shingleLength) {
 			if(s1) addToS1(mainString); 
 			else addToS2(mainString); 
 		}
 		
-		String firstString;  
-		String secondString; 
-//		int mid = mainString.length()/2; 
-//		if(mainString.length() %2 == 0) mid -= 1; 
+		String firstString;
 		
-		for(int i = 0; i <= mainString.length()-length; i++) {
-			firstString = mainString.substring(i, i+ length); 
-//			secondString = mainString.substring(mainString.length()-length-1-i, (mainString.length()-length-1-i)+length); 
+		for(int i = 0; i <= mainString.length()- shingleLength; i++) {
+			firstString = mainString.substring(i, i+ shingleLength);
 			if(s1) {
-				addToS1(firstString); 
-//				addToS1(secondString); 
+				addToS1(firstString);
 			}
 			else {
-				addToS2(firstString); 
-//				addToS2(secondString); 
+				addToS2(firstString);
 			}
 		}
 	}
@@ -115,7 +107,7 @@ public class BruteForceSimilarity extends newClass
 	public float lengthOfS1()
 	{
 		float result = 0.0f; 
-		if(s1.length() < length) return 0.0f; 
+		if(s1.length() < shingleLength) return 0.0f;
 		
 		for(String string : s1DistinctStrings) {
 			result += Math.pow(getS1Count(string), 2);  
@@ -128,7 +120,7 @@ public class BruteForceSimilarity extends newClass
 	{
 		// implementation
 		float result = 0.0f; 
-		if(s2.length() < length) return 0.0f; 
+		if(s2.length() < shingleLength) return 0.0f;
 		
 		for(String string : s2DistinctStrings) {
 			result += Math.pow(getS2Count(string), 2);  
