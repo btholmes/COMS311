@@ -80,6 +80,7 @@ public class WikiCrawler
 	        		boolean append = true; 
 	            os = new FileOutputStream(file, append);
 	            os.write(data.getBytes(), 0, data.length());
+	            os.write("\n".getBytes());
 	        } catch (IOException e) {
 	            e.printStackTrace();
 	        }finally{
