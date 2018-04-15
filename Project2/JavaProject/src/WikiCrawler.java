@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 
 public class WikiCrawler {
@@ -29,6 +30,7 @@ public class WikiCrawler {
     static int max;
     static ArrayList<String> topics;
     static String fileName;
+    static LinkedList<String> linksInContent;
 
     public WikiCrawler(String seedUrl, int max, ArrayList<String> topics, String fileName) {
         // implementation
@@ -97,5 +99,8 @@ public class WikiCrawler {
         }
     }
 
-
+    //Creates a queue of links after the first <p> tag
+    private void GetLinksInContent(String html) {
+//        int startIndex = html.index
+    }
 }
