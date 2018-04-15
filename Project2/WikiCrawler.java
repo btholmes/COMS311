@@ -74,11 +74,18 @@ public class WikiCrawler
          }  
 	}
 	
+	 static boolean firstLine = true; 
 	 private static void writeToFile(String data, File file) {
 	        OutputStream os = null;
 	        try {
-	        		boolean append = true; 
-	            os = new FileOutputStream(file, append);
+	        		if(firstLine) {
+		        		boolean append = false; 
+	    	            os = new FileOutputStream(file, append);
+	        			firstLine = false; 
+	        		}else {
+	        			boolean append = true; 
+	    	            os = new FileOutputStream(file, append);
+	        		}
 	            os.write(data.getBytes(), 0, data.length());
 	            os.write("\n".getBytes());
 	        } catch (IOException e) {

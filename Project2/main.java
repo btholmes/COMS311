@@ -8,7 +8,6 @@ import java.util.Arrays;
 
 public class main {
 	
-	
 	public static void main(String[] args)  {
 		ArrayList<String> topics = new ArrayList<String>(Arrays.asList("Iowa State", "Cyclones")); 
 		WikiCrawler w = new WikiCrawler("/wiki/Iowa_State_University", 100, topics, "WikiISU.txt");
