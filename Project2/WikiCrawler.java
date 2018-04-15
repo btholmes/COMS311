@@ -8,8 +8,8 @@
 //  (i.e., you may only include libraries of the form java.*)
 
 /**
-* @author Hugh Potter
-*/
+ * @author Hugh Potter
+ */
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,43 +23,40 @@ import java.net.URL;
 import java.util.ArrayList;
 
 
-public class WikiCrawler
-{
-	static final String BASE_URL = "https://en.wikipedia.org/";
-	static String seedUrl; 
-	static int max; 
-	static ArrayList<String> topics; 
-	static String fileName; 
+public class WikiCrawler {
+    static final String BASE_URL = "https://en.wikipedia.org/";
+    static String seedUrl;
+    static int max;
+    static ArrayList<String> topics;
+    static String fileName;
 
-	public WikiCrawler(String seedUrl, int max, ArrayList<String> topics, String fileName)
-	{
-		// implementation
-		this.seedUrl = seedUrl; 
-		this.max = max; 
-		this.topics = topics; 
-		this.fileName = fileName; 
-	}
+    public WikiCrawler(String seedUrl, int max, ArrayList<String> topics, String fileName) {
+        // implementation
+        this.seedUrl = seedUrl;
+        this.max = max;
+        this.topics = topics;
+        this.fileName = fileName;
+    }
 
-	public void crawl() throws IOException
-	{
-		// implementation
-		URL url;
-		try {
-			url = new URL(BASE_URL+"/wiki/Physics");
-			InputStream is = url.openStream();
-			BufferedReader br = new BufferedReader(new InputStreamReader(is));
-			readUrl(br); 			
-			br.close();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-		
-	}
-	
-	private void readUrl(BufferedReader br) throws IOException {
-	     String line = br.readLine(); 
-	     File file = new File(fileName); 
-         while(line != null){  
+    public void crawl() throws IOException {
+        // implementation
+        URL url;
+        try {
+            url = new URL(BASE_URL + "/wiki/Physics");
+            InputStream is = url.openStream();
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            readUrl(br);
+            br.close();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void readUrl(BufferedReader br) throws IOException {
+        String line = br.readLine();
+        File file = new File(fileName);
+        while (line != null) {
 
 //       	  	line = line.replaceAll(" ", "")
 //               .replaceAll("\t", "")
@@ -67,36 +64,38 @@ public class WikiCrawler
 //               .replaceAll(",", "")
 //               .replaceAll(":", "")
 //               .replaceAll(";", "");
-       	  	
-       	  	line.toLowerCase(); 
-       	  	writeToFile(line, file); 
-       	  	line = br.readLine(); 
-         }  
-	}
-	
-	 static boolean firstLine = true; 
-	 private static void writeToFile(String data, File file) {
-	        OutputStream os = null;
-	        try {
-	        		if(firstLine) {
-		        		boolean append = false; 
-	    	            os = new FileOutputStream(file, append);
-	        			firstLine = false; 
-	        		}else {
-	        			boolean append = true; 
-	    	            os = new FileOutputStream(file, append);
-	        		}
-	            os.write(data.getBytes(), 0, data.length());
-	            os.write("\n".getBytes());
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        }finally{
-	            try {
-	                os.close();
-	            } catch (IOException e) {
-	                e.printStackTrace();
-	            }
-	        }
-	    }
-	
+
+            line.toLowerCase();
+            writeToFile(line, file);
+            line = br.readLine();
+        }
+    }
+
+    static boolean firstLine = true;
+
+    private static void writeToFile(String data, File file) {
+        OutputStream os = null;
+        try {
+            if (firstLine) {
+                boolean append = false;
+                os = new FileOutputStream(file, append);
+                firstLine = false;
+            } else {
+                boolean append = true;
+                os = new FileOutputStream(file, append);
+            }
+            os.write(data.getBytes(), 0, data.length());
+            os.write("\n".getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                os.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
 }
