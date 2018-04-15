@@ -1,6 +1,7 @@
 .DS_Store
 *.class
 .idea
+<<<<<<< HEAD
 /.metadata/
 
 # Eclipse
@@ -19,3 +20,7 @@
 # Maven
 log/
 target/
+=======
+.classpath
+.project
+>>>>>>> 5318092e5769d144747ba711328d62926018b715
