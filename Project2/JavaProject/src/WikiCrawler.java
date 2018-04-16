@@ -22,6 +22,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class WikiCrawler {
@@ -100,7 +102,31 @@ public class WikiCrawler {
     }
 
     //Creates a queue of links after the first <p> tag
-    private void GetLinksInContent(String html) {
-//        int startIndex = html.index
+    public static LinkedList<String> GetLinksInContent(String html) {
+        LinkedList<String> returnList = new LinkedList<>();
+
+        int startIndex = html.indexOf("<p");
+        int endIndex = html.lastIndexOf("</p>");
+        html = html.substring(startIndex, endIndex);
+
+        Pattern anchorPattern = Pattern.compile("(?i)<a([^>]+)>(.+?)</a>");
+        Pattern hrefPattern = Pattern.compile("\\s*(?i)href\\s*=\\s*(\"([^\"]*\")|'[^']*'|([^'\">\\s]+))");
+        Matcher anchorMatcher = anchorPattern.matcher(html);
+
+        while (anchorMatcher.find()) {
+            String href = anchorMatcher.group(1);     // get the values of href
+            Matcher hrefMatcher = hrefPattern.matcher(href);
+            while (hrefMatcher.find()) {
+                String link = hrefMatcher.group(1);
+                link = link.replaceAll("'", "").replaceAll("\"", "");
+
+                if(!link.startsWith("/wiki/") || link.contains("#") || link.contains(":"))
+                    continue;
+
+                returnList.add(link);
+            }
+        }
+
+        return returnList;
     }
 }
