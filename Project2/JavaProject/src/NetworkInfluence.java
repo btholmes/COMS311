@@ -11,46 +11,155 @@
 * @author Hugh Potter
 */
 
+import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 public class NetworkInfluence
 {
-	// NOTE: graphData is an absolute file path that contains graph data, NOT the raw graph data itself
-	public NetworkInfluence(String graphData)
-	{
-		// implementation
+    private int numVertices;
+    private HashMap<String, GraphVertex> graphVertexHashMap;
+
+	public NetworkInfluence(String graphData) throws IOException {
+		graphVertexHashMap = new HashMap<>();
+	    File f = new File(graphData);
+		if(!f.exists() || f.isDirectory()) {
+			System.out.println("File specified for Network Influence does not exist. Returning.");
+			return;
+		}
+
+        // Always wrap FileReader in BufferedReader.
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(graphData));
+		String line = bufferedReader.readLine();
+
+		if(line == null) {
+            System.out.println("Error reading file in Network Influence. Returning.");
+            return;
+        }
+
+        try {
+		    numVertices = Integer.parseInt(line);
+        } catch (Exception e) {
+            System.out.println("Error parsing the number of vertices in Network Influence. Returning.");
+            return;
+        }
+
+		while((line = bufferedReader.readLine()) != null) {
+            if(line.equals(""))
+                continue;
+
+		    String[] vertices = line.split("\\s+");
+
+            if(vertices.length != 2) {
+                System.out.println("Improperly formatted line in Network Influence file. Expected only two names of vertices.");
+                return;
+            }
+
+            GraphVertex graphVertex1 = graphVertexHashMap.containsKey(vertices[0]) ? graphVertexHashMap.get(vertices[0]) : new GraphVertex(vertices[0]);
+            GraphVertex graphVertex2 = graphVertexHashMap.containsKey(vertices[1]) ? graphVertexHashMap.get(vertices[1]) : new GraphVertex(vertices[1]);
+
+            graphVertex1.AddOutDegreeVertex(graphVertex2);
+            graphVertex2.AddInDegreeVertex(graphVertex1);
+
+            graphVertexHashMap.putIfAbsent(graphVertex1.getVertexName(), graphVertex1);
+            graphVertexHashMap.putIfAbsent(graphVertex2.getVertexName(), graphVertex2);
+        }
+
+        bufferedReader.close();
+
+		if(graphVertexHashMap.size() != numVertices) {
+            System.out.println("WARNING! The number of vertices at the beginning of the file in Network Influence does not match the input of " + numVertices);
+        }
 	}
 
 	public int outDegree(String v)
 	{
-		// implementation
+	    GraphVertex graphVertex = graphVertexHashMap.get(v);
 
-		// replace this:
-		return -1;
+	    if(graphVertex == null) {
+            System.out.println("Vertex does not exist.");
+            return -1;
+        }
+
+		return graphVertex.GetOutDegreeSize();
 	}
+
+	// TODO remove or set to private.
+	public int inDegree(String v) {
+        GraphVertex graphVertex = graphVertexHashMap.get(v);
+
+        if(graphVertex == null) {
+            System.out.println("Vertex does not exist.");
+            return -1;
+        }
+
+        return graphVertex.GetInDegreeSize();
+    }
 
 	public ArrayList<String> shortestPath(String u, String v)
 	{
-		// implementation
+		LinkedList<String> ret = new LinkedList<>();
+        LinkedList<GraphVertex> queue = new LinkedList<>();
 
-		// replace this:
-		return null;
+		GraphVertex initialGraphVertex = graphVertexHashMap.get(u);
+        queue.addFirst(initialGraphVertex);
+        initialGraphVertex.setVisited(true);
+
+        while(!queue.isEmpty()) {
+            GraphVertex inspection = queue.pop();
+            HashMap<String, GraphVertex> outEdges = inspection.getOutDegrees();
+
+            outEdges.forEach((key, val) -> {
+                if(!val.getVisited()) {
+                    queue.addLast(val);
+                    val.setVisited(true);
+                    val.setParentBFS(inspection);
+                }
+
+                if(val.getVertexName().equals(v)) {
+                    ret.addFirst(val.getVertexName());
+                    GraphVertex parent = val.getParentBFS();
+
+                    while(parent != null) {
+                        ret.addFirst(parent.getVertexName());
+                        parent = parent.getParentBFS();
+                    }
+                }
+            });
+        }
+
+        ResetBFSAttributes();
+
+		return new ArrayList<>(ret);
 	}
 
 	public int distance(String u, String v)
 	{
-		// implementation:
+		if(u.equals(v))
+		    return 0;
 
-		// replace this:
-		return -1;
+		ArrayList<String> val = shortestPath(u, v);
+
+		return val.size() == 0 ? -1 : val.size();
 	}
 
 	public int distance(ArrayList<String> s, String v)
 	{
-		// implementation
+        Integer shortestPath = null;
 
-		// replace this:
-		return -1;
+        for(String str : s) {
+            int distance = distance(str, v);
+
+            if(distance != -1 && shortestPath == null) {
+                shortestPath = distance;
+            }
+            else if(distance != -1 && distance < shortestPath) {
+                shortestPath = distance;
+            }
+        }
+
+		return shortestPath == null ? -1 : shortestPath;
 	}
 
 	public float influence(String u)
@@ -92,4 +201,11 @@ public class NetworkInfluence
 		// replace this:
 		return null;
 	}
+
+	private void ResetBFSAttributes() {
+	    graphVertexHashMap.forEach((key, value) -> {
+	        value.setVisited(false);
+	        value.setParentBFS(null);
+        });
+    }
 }
