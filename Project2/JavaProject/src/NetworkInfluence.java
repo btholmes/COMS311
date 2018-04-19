@@ -14,10 +14,11 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.Stack;
 
 public class NetworkInfluence
 {
+    private static final int INF = Integer.MAX_VALUE;
     private int numVertices;
     private HashMap<String, GraphVertex> graphVertexHashMap;
 
@@ -99,37 +100,33 @@ public class NetworkInfluence
 
 	public ArrayList<String> shortestPath(String u, String v)
 	{
-		LinkedList<String> ret = new LinkedList<>();
-        LinkedList<GraphVertex> queue = new LinkedList<>();
-
-		GraphVertex initialGraphVertex = graphVertexHashMap.get(u);
-        queue.addFirst(initialGraphVertex);
-        initialGraphVertex.setVisited(true);
-
-        while(!queue.isEmpty()) {
-            GraphVertex inspection = queue.pop();
-            HashMap<String, GraphVertex> outEdges = inspection.getOutDegrees();
-
-            outEdges.forEach((key, val) -> {
-                if(!val.getVisited()) {
-                    queue.addLast(val);
-                    val.setVisited(true);
-                    val.setParentBFS(inspection);
-                }
-
-                if(val.getVertexName().equals(v)) {
-                    ret.addFirst(val.getVertexName());
-                    GraphVertex parent = val.getParentBFS();
-
-                    while(parent != null) {
-                        ret.addFirst(parent.getVertexName());
-                        parent = parent.getParentBFS();
-                    }
-                }
-            });
-        }
-
+		Stack<GraphVertex> stack = new Stack<>();
         ResetBFSAttributes();
+        graphVertexHashMap.get(u).setDistanceFromStart(0);
+
+        graphVertexHashMap.forEach((key,value) -> {
+            if(!value.visited())
+                TopilogicalSort(value, stack);
+        });
+
+        while (!stack.empty())
+        {
+            // Get the next vertex from topological order
+            GraphVertex graphVertex = stack.pop();
+
+            // Update distances of all adjacent vertices
+            Iterator<AdjListNode> it;
+            if (dist[u] != INF)
+            {
+                it = adj[u].iterator();
+                while (it.hasNext())
+                {
+                    AdjListNode i= it.next();
+                    if (dist[i.getV()] > dist[u] + i.getWeight())
+                        dist[i.getV()] = dist[u] + i.getWeight();
+                }
+            }
+        }
 
 		return new ArrayList<>(ret);
 	}
@@ -202,10 +199,15 @@ public class NetworkInfluence
 		return null;
 	}
 
+	private void TopilogicalSort(GraphVertex graphVertex, Stack stack) {
+
+    }
+
 	private void ResetBFSAttributes() {
 	    graphVertexHashMap.forEach((key, value) -> {
 	        value.setVisited(false);
 	        value.setParentBFS(null);
+	        value.setDistanceFromStart(INF);
         });
     }
 }

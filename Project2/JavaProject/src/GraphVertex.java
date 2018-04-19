@@ -3,6 +3,7 @@ import java.util.HashMap;
 public class GraphVertex {
     private String vertexName;
     private Boolean visited;
+    private int distanceFromStart;
     private GraphVertex parentBFS;
     private HashMap<String, GraphVertex> outDegrees;
     private HashMap<String, GraphVertex> inDegrees;
@@ -39,7 +40,7 @@ public class GraphVertex {
         return vertexName;
     }
 
-    public Boolean getVisited() {
+    public Boolean visited() {
         return visited;
     }
 
@@ -53,5 +54,13 @@ public class GraphVertex {
 
     public void setParentBFS(GraphVertex parentBFS) {
         this.parentBFS = parentBFS;
+    }
+
+    public int getDistanceFromStart() {
+        return distanceFromStart;
+    }
+
+    public void setDistanceFromStart(int distanceFromStart) {
+        this.distanceFromStart = distanceFromStart;
     }
 }
