@@ -13,7 +13,6 @@
 
 import ahocorasick.AhoCorasick;
 import ahocorasick.SearchResult;
-import com.sun.deploy.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,8 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.*;
 import java.util.ArrayList;
@@ -45,9 +42,6 @@ public class WikiCrawler {
     static HashMap<String, LinkedList<String>> graph;
     private ArrayList<String> links;
 
-    private ArrayList<String> traversal;
-    private HashMap<String, Integer> map;
-    //
     File file;
 
     public WikiCrawler(String seedUrl, int max, ArrayList<String> topics, String fileName) {
@@ -79,7 +73,6 @@ public class WikiCrawler {
         // implementation
         topicsMap = new HashMap<>();
         graph = new HashMap<>();
-        traversal = new ArrayList<>();
         writeToFile(max + "", "");
         BFS(seedUrl);
     }
@@ -92,13 +85,14 @@ public class WikiCrawler {
         try {
             requests++;
             String string = BASE_URL + seedUrl;
+            string = string.replaceAll("&", "%26");
             url = new URL(string);
             InputStream is = url.openStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             readUrl(seedUrl, br, visited, queue, false);
             br.close();
-
 //            if(requests % 25 == 0) Thread.sleep(3000);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -153,7 +147,6 @@ public class WikiCrawler {
 
 
     static boolean firstLine = true;
-
     private void writeToFile(String node, String edge) {
         OutputStream os = null;
         try {
@@ -198,9 +191,6 @@ public class WikiCrawler {
         return result;
     }
 
-    private boolean countMet(int count) {
-        return count == max;
-    }
 
     private void BFS(String seedUrl) throws IOException {
         int nodeCount = 0;
@@ -220,10 +210,9 @@ public class WikiCrawler {
 
         while (queue.size() != 0) {
             String node = queue.poll();
-
-//            System.out.println("\n Node is " + node + "\n");
             Iterator<String> edges = graph.get(node).listIterator();
             HashMap<String, Integer> addedValues = new HashMap<>();
+
             while (edges.hasNext()) {
                 String edge = edges.next();
                 if (visited.get(edge) == null || visited.get(edge) == false) {
@@ -242,43 +231,12 @@ public class WikiCrawler {
                     if (graph.containsKey(edge) && !node.equals(edge)) {
                         if (!addedValues.containsKey(edge))
                             writeToFile(node, edge);
-                        addedValues.put(edge, 1);
+                            addedValues.put(edge, 1);
                     }
                 }
             }
         }
     }
-//=======
-//    //Creates a queue of links after the first <p> tag
-//    public static LinkedList<String> GetLinksInContent(String html) {
-//        LinkedList<String> returnList = new LinkedList<>();
-//
-//        int startIndex = html.indexOf("<p");
-//        int endIndex = html.lastIndexOf("</p>");
-//        html = html.substring(startIndex, endIndex);
-//
-//        Pattern anchorPattern = Pattern.compile("(?i)<a([^>]+)>(.+?)</a>");
-//        Pattern hrefPattern = Pattern.compile("\\s*(?i)href\\s*=\\s*(\"([^\"]*\")|'[^']*'|([^'\">\\s]+))");
-//        Matcher anchorMatcher = anchorPattern.matcher(html);
-//
-//        while (anchorMatcher.find()) {
-//            String href = anchorMatcher.group(1);     // get the values of href
-//            Matcher hrefMatcher = hrefPattern.matcher(href);
-//            while (hrefMatcher.find()) {
-//                String link = hrefMatcher.group(1);
-//                link = link.replaceAll("'", "").replaceAll("\"", "");
-//
-//                if(!link.startsWith("/wiki/") || link.contains("#") || link.contains(":"))
-//                    continue;
-//
-//                returnList.add(link);
-//            }
-//        }
-//
-//        return returnList;
-//>>>>>>> 0281eaf72ab2b56c9f75c38d3307e474095ea419
-//    }
-
 
 
 }
