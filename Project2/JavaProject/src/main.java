@@ -5,12 +5,18 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class main {
 	
 	public static void main(String[] args)  {
-		ArrayList<String> topics = new ArrayList<String>(Arrays.asList("Iowa State", "Cyclones")); 
-		WikiCrawler w = new WikiCrawler("/wiki/Iowa_State_University", 100, topics, "WikiISU.txt");
+//		"Iowa State", "Cyclones"
+		ArrayList<String> topics = new ArrayList<>(Arrays.asList());
+//		String seed = "/wiki/Iowa_State_University";
+//		String seed = "/wiki/Iowa_State_Cyclones";
+		String seed = "/wiki/Complexity_theory";
+//		String seed = "/wiki/Iowa_State_University_College_of_Veterinary_Medicine";
+		WikiCrawler w = new WikiCrawler(seed, 20, topics, "WikiISU.txt");
 		try {
 			w.crawl();
 		} catch (IOException e) {
@@ -18,21 +24,8 @@ public class main {
 			e.printStackTrace();
 			System.out.println("Exception");
 		}
-	
+
 	}
-	
-	private void testFileCreation() throws FileNotFoundException{
-		File file = new File("random.txt"); 
-		OutputStream os = new FileOutputStream(file);
-        try {
-        		String data = "Hello"; 
-			os.write(data.getBytes(), 0, data.length());
-			os.write("\n".getBytes());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.out.println("Exception");
-		}
-	}
+
 
 }
