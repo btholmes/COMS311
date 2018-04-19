@@ -91,41 +91,64 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         return graphVertex.GetInDegreeSize();
     }
 
+    private ArrayList<String> backTrackPath(HashMap<String, String> prev, String u, String v){
+        ArrayList<String> result = new ArrayList<>();
+        if(u.equals(v)){
+            result.add(u);
+            return result;
+        }
+        if(!graphVertexHashMap.containsKey(v) || !graphVertexHashMap.containsKey(u)) return result;
+        if(prev.get(v) == null) return result;
 
-//    Just do a BFS
+        result.add(v);
+        String item = prev.get(v);
+        while(item != null ){
+            result.add(item);
+            item = prev.get(item);
+            if(item != null && item.equals(u)){
+                result.add(u);
+                break;
+            }
+
+        }
+        System.out.println(result);
+        Collections.reverse(result);
+
+        return result;
+    }
+
     public ArrayList<String> shortestPath(String u, String v)
     {
         ArrayList<String> path = new ArrayList<>();
+        HashMap<String, Boolean> flag = new HashMap<>();
+        HashMap<String, String> prev = new HashMap<>();
 
         Queue<GraphVertex> queue = new LinkedList<>();
         HashMap<String, Boolean> visited = new HashMap<>();
 
         GraphVertex src = graphVertexHashMap.get(u);
+        flag.put(src.getVertexName(), true);
         queue.add(src);
         visited.put(src.getVertexName(), true);
 
         while(!queue.isEmpty()){
             GraphVertex node = queue.poll();
-            path.add(node.getVertexName());
 
             HashMap<String, GraphVertex> edges = node.getOutDegrees();
             Iterator it = edges.entrySet().iterator();
             while(it.hasNext()){
                 Map.Entry pair = (Map.Entry)it.next();
-                if(pair.getKey().equals(v)){
-                    path.add((String)pair.getKey());
-                    return path;
-                }
-                else if(!visited.containsKey(pair.getKey())){
+                if(flag.get(pair.getKey()) == null || flag.get(pair.getKey()) == false){
                     String vertex = (String)pair.getKey();
-                    visited.put(vertex, true);
+                    flag.put(vertex, true);
+                    prev.put(vertex, node.getVertexName());
                     queue.add(edges.get(pair.getKey()));
                 }
             }
 
         }
-
-        return path.get(path.size()-1).equals(v) ? path : new ArrayList<>();
+        path = backTrackPath(prev, u, v);
+        return path;
     }
 
 //    Shortest path between two nodes
@@ -136,7 +159,8 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
 
         ArrayList<String> val = shortestPath(u, v);
 
-        return val.size() == 0 ? -1 : val.size();
+        return val.size() == 0 ? -1 : val.size() -1;
+//        return val.size();
     }
 
 //    Shortest path again
@@ -158,12 +182,30 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         return shortestPath == null ? -1 : shortestPath;
     }
 
+    private int gety(String x, int i){
+        int y = 0;
+        if(i ==0) return 1;
+        if(i == 1) return outDegree(x);
+        else{
+            ArrayList<String> allVertexes = new ArrayList<>(graphVertexHashMap.keySet());
+            for(String vertex : allVertexes){
+                if(distance(x, vertex) == i){
+                    y+=1;
+                }
+            }
+        }
+        return y;
+    }
+
     public float influence(String u)
     {
         // implementation
-
-        // replace this:
-        return -1f;
+        float sum = 0;
+        for(int i =0; i < numVertices; i++){
+            int y = gety(u, i);
+            sum += (1/(Math.pow(2,i)) * y);
+        }
+        return sum;
     }
 
     public float influence(ArrayList<String> s)
