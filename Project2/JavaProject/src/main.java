@@ -17,16 +17,29 @@ public class main {
 //		String seed = "/wiki/Complexity_theory";
 //		String seed = "/wiki/Iowa_State_University_College_of_Veterinary_Medicine";
 //		String seed = "/wiki/Texas_A&M";
-		Long time = System.currentTimeMillis();
-		WikiCrawler w = new WikiCrawler(seed, 100, topics, "WikiISU.txt");
-		try {
-			w.crawl();
-			System.out.println((System.currentTimeMillis() - time)/1000 + "seconds");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+
+//		Long time = System.currentTimeMillis();
+//		WikiCrawler w = new WikiCrawler(seed, 100, topics, "WikiISU.txt");
+//		try {
+//			w.crawl();
+//			System.out.println((System.currentTimeMillis() - time)/1000 + "seconds");
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			System.out.println("Exception");
+//		}
+
+		try{
+			NetworkInfluenceCopySoWeDontModifySamePage network = new NetworkInfluenceCopySoWeDontModifySamePage("/Users/benholmes/Documents/GitHubRepos/COMS311/Project2/NetworkInfluenceData.txt");
+			ArrayList<String> path = network.shortestPath("Minneapolis", "Chicago");
+			System.out.println("\n" + path);
+
+
+		}catch(Exception e){
 			e.printStackTrace();
-			System.out.println("Exception");
 		}
+
+
 
 	}
 

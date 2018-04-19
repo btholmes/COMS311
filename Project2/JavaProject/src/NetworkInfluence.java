@@ -109,26 +109,28 @@ public class NetworkInfluence
                 TopilogicalSort(value, stack);
         });
 
-        while (!stack.empty())
-        {
-            // Get the next vertex from topological order
-            GraphVertex graphVertex = stack.pop();
+//        while (!stack.empty())
+//        {
+//            // Get the next vertex from topological order
+//            GraphVertex graphVertex = stack.pop();
+//
+//            // Update distances of all adjacent vertices
+//            Iterator<AdjListNode> it;
+//            if (dist[u] != INF)
+//            {
+//                it = adj[u].iterator();
+//                while (it.hasNext())
+//                {
+//                    AdjListNode i= it.next();
+//                    if (dist[i.getV()] > dist[u] + i.getWeight())
+//                        dist[i.getV()] = dist[u] + i.getWeight();
+//                }
+//            }
+//        }
 
-            // Update distances of all adjacent vertices
-            Iterator<AdjListNode> it;
-            if (dist[u] != INF)
-            {
-                it = adj[u].iterator();
-                while (it.hasNext())
-                {
-                    AdjListNode i= it.next();
-                    if (dist[i.getV()] > dist[u] + i.getWeight())
-                        dist[i.getV()] = dist[u] + i.getWeight();
-                }
-            }
-        }
+//		return new ArrayList<>(ret);
 
-		return new ArrayList<>(ret);
+        return new ArrayList<>();
 	}
 
 	public int distance(String u, String v)
