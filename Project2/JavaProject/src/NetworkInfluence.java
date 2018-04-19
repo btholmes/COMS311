@@ -180,9 +180,11 @@ public class NetworkInfluence
 
 	public ArrayList<String> mostInfluentialDegree(int k)
 	{
-		// implementation
+	    // Output nodes with top k outdegrees.
+	    graphVertexHashMap.forEach((key, value) -> {
 
-		// replace this:
+        });
+
 		return null;
 	}
 
