@@ -1,4 +1,4 @@
-100 
+100
 /wiki/Iowa_State_University /wiki/Ames,_Iowa
 /wiki/Iowa_State_University /wiki/Iowa
 /wiki/Iowa_State_University /wiki/Iowa_State_University_College_of_Veterinary_Medicine
