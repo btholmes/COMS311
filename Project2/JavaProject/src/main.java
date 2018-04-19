@@ -48,6 +48,7 @@ public class main {
 //			System.out.println(network.influence(set));
 //			System.out.println(network.distance(set, "B"));
 			System.out.println(network.mostInfluentialDegree(10));
+			System.out.println(network.mostInfluentialModular(10));
 
 //			String file = "/Users/benholmes/Documents/GitHubRepos/COMS311/Project2/wikiISU.txt";
 //			NetworkInfluenceCopySoWeDontModifySamePage network = new NetworkInfluenceCopySoWeDontModifySamePage(file);

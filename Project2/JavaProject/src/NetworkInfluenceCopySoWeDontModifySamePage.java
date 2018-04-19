@@ -239,7 +239,7 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         return sum;
     }
 
-    public void getMaps(HashMap<Integer, ArrayList<String>> allValues, ArrayList<Integer> maxValues){
+    public void getDegreeMaps(HashMap<Integer, ArrayList<String>> allValues, ArrayList<Integer> maxValues){
         Iterator it = graphVertexHashMap.entrySet().iterator();
         while(it.hasNext()){
             Map.Entry pair = (Map.Entry) it.next();
@@ -261,7 +261,7 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
     {
         HashMap<Integer, ArrayList<String>> allDegrees = new HashMap<>();
         ArrayList<Integer> maxDegrees = new ArrayList<>();
-        getMaps(allDegrees, maxDegrees);
+        getDegreeMaps(allDegrees, maxDegrees);
 
         ArrayList<String> result = new ArrayList<String>();
         int added = 0;
@@ -284,6 +284,7 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
                             added++;
                             if(k <= 0 || added >= maxDegrees.size()) break;
                         }
+                        if(k <= 0 || added >= maxDegrees.size()) break;
                     }
                 }
                 if(k <= 0 || added >= maxDegrees.size()) break;
@@ -294,19 +295,70 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         return result;
     }
 
+    public void getInfluentialModularMaps(HashMap<Float, ArrayList<String>> allValues, ArrayList<Float> maxValues){
+        Iterator it = graphVertexHashMap.entrySet().iterator();
+        while(it.hasNext()){
+            Map.Entry pair = (Map.Entry) it.next();
+            String vertex = (String)pair.getKey();
+            float influence = influence(vertex);
+            if(allValues.get(influence) == null){
+                ArrayList<String> list = new ArrayList<>();
+                list.add(vertex);
+                allValues.put(influence, list);
+            } else{
+                allValues.get(influence).add(vertex);
+            }
+            maxValues.add(influence);
+        }
+        Collections.sort(maxValues);
+    }
+
     public ArrayList<String> mostInfluentialModular(int k)
     {
+        HashMap<Float, ArrayList<String>> allInfluences = new HashMap<>();
+        ArrayList<Float> maxInfluences = new ArrayList<>();
+        getInfluentialModularMaps(allInfluences, maxInfluences);
 
 
-        // replace this:
-        return null;
+        ArrayList<String> result = new ArrayList<String>();
+        int added = 0;
+        Float prev = (float)Integer.MIN_VALUE;
+        while(k > 0 && added < maxInfluences.size()){
+            for(int i = maxInfluences.size()-1 ; i >= 0; i--){
+                Float value = maxInfluences.get(i);
+                if(value.equals(prev)) {
+                    continue;
+                }
+
+                ArrayList<String> nodes = allInfluences.get(value);
+                if(nodes.size() <= k && (added + nodes.size() < maxInfluences.size())) {
+                    result.addAll(nodes);
+                    k -= nodes.size();
+                    added += nodes.size();
+                } else{
+                    while(k > 0 && added < maxInfluences.size()){
+                        for(String node : nodes){
+                            result.add(node);
+                            k--;
+                            added++;
+                            if(k <= 0 || added >= maxInfluences.size()) break;
+                        }
+                        if(k <= 0 || added >= maxInfluences.size()) break;
+                    }
+                }
+                if(k <= 0 || added >= maxInfluences.size()) break;
+                prev = value;
+            }
+        }
+
+        return result;
     }
 
     public ArrayList<String> mostInfluentialSubModular(int k)
     {
-        // implementation
 
-        // replace this:
+
+
         return null;
     }
 
