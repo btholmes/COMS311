@@ -11,15 +11,15 @@ public class main {
 	
 	public static void main(String[] args)  {
 //		"Iowa State", "Cyclones"
-		ArrayList<String> topics = new ArrayList<>(Arrays.asList("Iowa State", "Cyclones"));
-		String seed = "/wiki/Iowa_State_University";
+		ArrayList<String> topics = new ArrayList<>(Arrays.asList());
+//		String seed = "/wiki/Iowa_State_University";
 //		String seed = "/wiki/Iowa_State_Cyclones";
 //		String seed = "/wiki/Complexity_theory";
 //		String seed = "/wiki/Iowa_State_University_College_of_Veterinary_Medicine";
-//		String seed = "/wiki/Texas_A&M";
+		String seed = "/wiki/Computer_Science";
 
 //		Long time = System.currentTimeMillis();
-//		WikiCrawler w = new WikiCrawler(seed, 100, topics, "WikiISU.txt");
+//		WikiCrawler w = new WikiCrawler(seed, 100, topics, "WikiCS.txt");
 //		try {
 //			w.crawl();
 //			System.out.println((System.currentTimeMillis() - time)/1000 + "seconds");
@@ -42,17 +42,17 @@ public class main {
 
 
 
-			String file = "/Users/benholmes/Documents/GitHubRepos/COMS311/Project2/graph3";
-			NetworkInfluenceCopySoWeDontModifySamePage network = new NetworkInfluenceCopySoWeDontModifySamePage(file);
-//			ArrayList<String> set = new ArrayList<>(Arrays.asList("A", "C"));
-//			System.out.println(network.influence(set));
-//			System.out.println(network.distance(set, "B"));
-			System.out.println(network.mostInfluentialDegree(10));
-			System.out.println(network.mostInfluentialModular(10));
-
-//			String file = "/Users/benholmes/Documents/GitHubRepos/COMS311/Project2/wikiISU.txt";
+//			String file = "/Users/benholmes/Documents/GitHubRepos/COMS311/Project2/graph3";
 //			NetworkInfluenceCopySoWeDontModifySamePage network = new NetworkInfluenceCopySoWeDontModifySamePage(file);
-//			System.out.println(network.mostInfluentialDegree(2));
+////			ArrayList<String> set = new ArrayList<>(Arrays.asList("A", "C"));
+////			System.out.println(network.influence(set));
+////			System.out.println(network.distance(set, "B"));
+//			System.out.println(network.mostInfluentialDegree(10));
+//			System.out.println(network.mostInfluentialModular(10));
+
+			String file = "/Users/benholmes/Documents/GitHubRepos/COMS311/Project2/wikiCS.txt";
+			NetworkInfluenceCopySoWeDontModifySamePage network = new NetworkInfluenceCopySoWeDontModifySamePage(file);
+			System.out.println(network.mostInfluentialDegree(10));
 
 
 		}catch(Exception e){

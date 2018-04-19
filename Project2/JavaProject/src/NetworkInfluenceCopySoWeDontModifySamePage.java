@@ -37,7 +37,7 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         }
 
         try {
-            numVertices = Integer.parseInt(line);
+            numVertices = Integer.parseInt(line.trim());
         } catch (Exception e) {
             System.out.println("Error parsing the number of vertices in Network Influence. Returning.");
             return;
