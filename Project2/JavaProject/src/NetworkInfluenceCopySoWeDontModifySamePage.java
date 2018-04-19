@@ -239,6 +239,7 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         return sum;
     }
 
+    //Takes O(n)
     public void getDegreeMaps(HashMap<Integer, ArrayList<String>> allValues, ArrayList<Integer> maxValues){
         Iterator it = graphVertexHashMap.entrySet().iterator();
         while(it.hasNext()){
@@ -295,6 +296,7 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         return result;
     }
 
+    //Takes O(n)
     public void getInfluentialModularMaps(HashMap<Float, ArrayList<String>> allValues, ArrayList<Float> maxValues){
         Iterator it = graphVertexHashMap.entrySet().iterator();
         while(it.hasNext()){
@@ -356,7 +358,13 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
 
     public ArrayList<String> mostInfluentialSubModular(int k)
     {
+        ArrayList<String> S = new ArrayList<String>();
 
+        Iterator it = graphVertexHashMap.entrySet().iterator();
+        while(it.hasNext()){
+            Map.Entry entry = (Map.Entry)it.next();
+
+        }
 
 
         return null;
