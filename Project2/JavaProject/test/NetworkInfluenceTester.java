@@ -45,6 +45,12 @@ public class NetworkInfluenceTester {
         distance = networkInfluence.distance("9", "9");
         if(distance != 0)
             throw new Exception("Shortest distance expected to be 0. Was: " + distance);
+
+        ArrayList<String> arrayList = networkInfluence.shortestPath("1", "5");
+        if(arrayList.size() != 3)
+            throw new Exception("Size is expected to be 3. Was: " + arrayList.size());
+        if(!arrayList.toString().equals("[1, 3, 5]"))
+            throw new Exception("Expected shortest path to be [1, 3, 5]. Was: " + arrayList.toString());
     }
 
     private static void TestOriginalFile() throws Exception {
