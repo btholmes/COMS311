@@ -31,9 +31,9 @@ public class main {
 
 		try{
 			NetworkInfluenceCopySoWeDontModifySamePage network = new NetworkInfluenceCopySoWeDontModifySamePage("/Users/benholmes/Documents/GitHubRepos/COMS311/Project2/NetworkInfluenceData.txt");
-			ArrayList<String> path = network.shortestPath("Chicago", "sdfd");
-			System.out.println(path);
-//			System.out.println("\n" + network.influence("Ames"));
+//			ArrayList<String> path = network.shortestPath("Chicago", "sdfd");
+//			System.out.println(path);
+			System.out.println("\n" + network.influence("Ames"));
 
 
 		}catch(Exception e){

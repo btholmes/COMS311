@@ -111,7 +111,7 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
             }
 
         }
-        System.out.println(result);
+//        System.out.println(result);
         Collections.reverse(result);
 
         return result;
