@@ -30,10 +30,28 @@ public class main {
 //		}
 
 		try{
-			NetworkInfluenceCopySoWeDontModifySamePage network = new NetworkInfluenceCopySoWeDontModifySamePage("/Users/benholmes/Documents/GitHubRepos/COMS311/Project2/NetworkInfluenceData.txt");
-//			ArrayList<String> path = network.shortestPath("Chicago", "sdfd");
+//			String file = "/Users/benholmes/Documents/GitHubRepos/COMS311/Project2/graph1";
+//			NetworkInfluenceCopySoWeDontModifySamePage network = new NetworkInfluenceCopySoWeDontModifySamePage(file);
+//			ArrayList<String> path = network.shortestPath("Ames", "Ames");
 //			System.out.println(path);
-			System.out.println("\n" + network.influence("Ames"));
+
+//			ArrayList<String> places = new ArrayList<>(Arrays.asList("Chicago", "Chicago"));
+//			int distance = network.distance(places, "Minneapolis");
+//			System.out.println(distance);
+
+
+
+
+			String file = "/Users/benholmes/Documents/GitHubRepos/COMS311/Project2/graph3";
+			NetworkInfluenceCopySoWeDontModifySamePage network = new NetworkInfluenceCopySoWeDontModifySamePage(file);
+//			ArrayList<String> set = new ArrayList<>(Arrays.asList("A", "C"));
+//			System.out.println(network.influence(set));
+//			System.out.println(network.distance(set, "B"));
+			System.out.println(network.mostInfluentialDegree(10));
+
+//			String file = "/Users/benholmes/Documents/GitHubRepos/COMS311/Project2/wikiISU.txt";
+//			NetworkInfluenceCopySoWeDontModifySamePage network = new NetworkInfluenceCopySoWeDontModifySamePage(file);
+//			System.out.println(network.mostInfluentialDegree(2));
 
 
 		}catch(Exception e){

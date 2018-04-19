@@ -63,4 +63,5 @@ public class GraphVertex {
     public void setDistanceFromStart(int distanceFromStart) {
         this.distanceFromStart = distanceFromStart;
     }
+
 }

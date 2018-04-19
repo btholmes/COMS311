@@ -1,8 +1,12 @@
+import com.sun.corba.se.impl.orbutil.graph.Graph;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Hugh Potter
@@ -200,7 +204,7 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
     public float influence(String u)
     {
         // implementation
-        float sum = 0;
+        float sum = 0.0f;
         for(int i =0; i < numVertices; i++){
             int y = gety(u, i);
             sum += (1/(Math.pow(2,i)) * y);
@@ -208,25 +212,91 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         return sum;
     }
 
+    private int gety(ArrayList<String> s, int i){
+        int y = 0;
+        if(i ==0) return s.size();
+        else{
+            ArrayList<String> allVertexes = new ArrayList<>(graphVertexHashMap.keySet());
+            for(String vertex : allVertexes){
+                if(distance(s, vertex) == i){
+//                    System.out.println(vertex);
+                    y+=1;
+                }
+            }
+        }
+        return y;
+    }
+
     public float influence(ArrayList<String> s)
     {
-        // implementation
+        float sum = 0.0f;
+        for(int i =0; i < numVertices; i++){
+            int y = gety(s, i);
+//            System.out.println("i is " + i  + " and nodes at distance are " + y);
+            sum += (1/(Math.pow(2,i)) * y);
+        }
 
-        // replace this:
-        return -1f;
+        return sum;
+    }
+
+    public void getMaps(HashMap<Integer, ArrayList<String>> allValues, ArrayList<Integer> maxValues){
+        Iterator it = graphVertexHashMap.entrySet().iterator();
+        while(it.hasNext()){
+            Map.Entry pair = (Map.Entry) it.next();
+            String vertex = (String)pair.getKey();
+            int outDegree = outDegree(vertex);
+            if(allValues.get(outDegree) == null){
+                ArrayList<String> list = new ArrayList<String>();
+                list.add(vertex);
+                allValues.put(outDegree, list);
+            } else{
+                allValues.get(outDegree).add(vertex);
+            }
+            maxValues.add(outDegree);
+        }
+        Collections.sort(maxValues);
     }
 
     public ArrayList<String> mostInfluentialDegree(int k)
     {
-        // implementation
+        HashMap<Integer, ArrayList<String>> allDegrees = new HashMap<>();
+        ArrayList<Integer> maxDegrees = new ArrayList<>();
+        getMaps(allDegrees, maxDegrees);
 
-        // replace this:
-        return null;
+        ArrayList<String> result = new ArrayList<String>();
+        int added = 0;
+        int prev = Integer.MIN_VALUE;
+        while(k > 0 && added < maxDegrees.size()){
+            for(int i = maxDegrees.size()-1 ; i >= 0; i--){
+                Integer value = maxDegrees.get(i);
+                if(value == prev) continue;
+
+                ArrayList<String> nodes = allDegrees.get(value);
+                if(nodes.size() <= k && (added + nodes.size() < maxDegrees.size())) {
+                    result.addAll(nodes);
+                    k -= nodes.size();
+                    added += nodes.size();
+                } else{
+                    while(k > 0 && added < maxDegrees.size()){
+                        for(String node : nodes){
+                            result.add(node);
+                            k--;
+                            added++;
+                            if(k <= 0 || added >= maxDegrees.size()) break;
+                        }
+                    }
+                }
+                if(k <= 0 || added >= maxDegrees.size()) break;
+                prev = value;
+            }
+        }
+
+        return result;
     }
 
     public ArrayList<String> mostInfluentialModular(int k)
     {
-        // implementation
+
 
         // replace this:
         return null;
