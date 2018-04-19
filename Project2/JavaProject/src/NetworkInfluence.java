@@ -14,6 +14,7 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Stack;
 
 public class NetworkInfluence
@@ -22,28 +23,23 @@ public class NetworkInfluence
     private int numVertices;
     private HashMap<String, GraphVertex> graphVertexHashMap;
 
-	public NetworkInfluence(String graphData) throws IOException {
+	public NetworkInfluence(String graphData) throws Exception {
 		graphVertexHashMap = new HashMap<>();
 	    File f = new File(graphData);
-		if(!f.exists() || f.isDirectory()) {
-			System.out.println("File specified for Network Influence does not exist. Returning.");
-			return;
-		}
+		if(!f.exists() || f.isDirectory())
+			throw new Exception("File specified for Network Influence does not exist. Returning.");
 
         // Always wrap FileReader in BufferedReader.
         BufferedReader bufferedReader = new BufferedReader(new FileReader(graphData));
 		String line = bufferedReader.readLine();
 
-		if(line == null) {
-            System.out.println("Error reading file in Network Influence. Returning.");
-            return;
-        }
+		if(line == null)
+            throw new Exception("Error reading file in Network Influence. Returning.");
 
         try {
 		    numVertices = Integer.parseInt(line);
         } catch (Exception e) {
-            System.out.println("Error parsing the number of vertices in Network Influence. Returning.");
-            return;
+            throw new Exception("Error parsing the number of vertices in Network Influence. Returning.");
         }
 
 		while((line = bufferedReader.readLine()) != null) {
@@ -52,10 +48,8 @@ public class NetworkInfluence
 
 		    String[] vertices = line.split("\\s+");
 
-            if(vertices.length != 2) {
-                System.out.println("Improperly formatted line in Network Influence file. Expected only two names of vertices.");
-                return;
-            }
+            if(vertices.length != 2)
+                throw new Exception("Improperly formatted line in Network Influence file. Expected only two names of vertices.");
 
             GraphVertex graphVertex1 = graphVertexHashMap.containsKey(vertices[0]) ? graphVertexHashMap.get(vertices[0]) : new GraphVertex(vertices[0]);
             GraphVertex graphVertex2 = graphVertexHashMap.containsKey(vertices[1]) ? graphVertexHashMap.get(vertices[1]) : new GraphVertex(vertices[1]);
@@ -69,9 +63,8 @@ public class NetworkInfluence
 
         bufferedReader.close();
 
-		if(graphVertexHashMap.size() != numVertices) {
+		if(graphVertexHashMap.size() != numVertices)
             System.out.println("WARNING! The number of vertices at the beginning of the file in Network Influence does not match the input of " + numVertices);
-        }
 	}
 
 	public int outDegree(String v)
@@ -100,45 +93,55 @@ public class NetworkInfluence
 
 	public ArrayList<String> shortestPath(String u, String v)
 	{
+	    if(u.equals(v)) {
+	        ArrayList<String> ret = new ArrayList<>();
+	        ret.add(u);
+	        return ret;
+        }
+
+	    GraphVertex endVertex = graphVertexHashMap.get(v);
+
+	    if(endVertex == null) {
+	        return new ArrayList<>();
+        }
+
 		Stack<GraphVertex> stack = new Stack<>();
         ResetBFSAttributes();
         graphVertexHashMap.get(u).setDistanceFromStart(0);
 
         graphVertexHashMap.forEach((key,value) -> {
             if(!value.visited())
-                TopilogicalSort(value, stack);
+                TopologicalSort(value, stack);
         });
 
         while (!stack.empty())
         {
-            // Get the next vertex from topological order
             GraphVertex graphVertex = stack.pop();
 
-            // Update distances of all adjacent vertices
-            Iterator<AdjListNode> it;
-            if (dist[u] != INF)
-            {
-                it = adj[u].iterator();
-                while (it.hasNext())
-                {
-                    AdjListNode i= it.next();
-                    if (dist[i.getV()] > dist[u] + i.getWeight())
-                        dist[i.getV()] = dist[u] + i.getWeight();
-                }
+            if(graphVertex.getDistanceFromStart() != INF) {
+                UpdateDistances(graphVertex);
             }
         }
 
-		return new ArrayList<>(ret);
+        LinkedList<String> graphVertices = new LinkedList<>();
+        GraphVertex parentNode = endVertex.getParentBFS();
+
+        while(parentNode != null) {
+            if(graphVertices.size() == 0) {
+                graphVertices.addLast(endVertex.getVertexName());
+            }
+            graphVertices.addFirst(parentNode.getVertexName());
+            parentNode = parentNode.getParentBFS();
+        }
+
+		return new ArrayList<>(graphVertices);
 	}
 
 	public int distance(String u, String v)
 	{
-		if(u.equals(v))
-		    return 0;
+		ArrayList<String> shortestPath = shortestPath(u, v);
 
-		ArrayList<String> val = shortestPath(u, v);
-
-		return val.size() == 0 ? -1 : val.size();
+		return shortestPath.size() == 0 ? -1 : (shortestPath.size() - 1);
 	}
 
 	public int distance(ArrayList<String> s, String v)
@@ -199,8 +202,26 @@ public class NetworkInfluence
 		return null;
 	}
 
-	private void TopilogicalSort(GraphVertex graphVertex, Stack stack) {
+	private void UpdateDistances(GraphVertex graphVertex) {
+        graphVertex.getOutDegrees().forEach((key, value) -> {
+            if (value.getDistanceFromStart() > graphVertex.getDistanceFromStart() + 1) {
+                value.setDistanceFromStart(graphVertex.getDistanceFromStart() + 1);
+                value.setParentBFS(graphVertex);
+                UpdateDistances(value);
+            }
+        });
+    }
 
+	private void TopologicalSort(GraphVertex graphVertex, Stack<GraphVertex> stack) {
+        graphVertex.setVisited(true);
+
+        graphVertex.getOutDegrees().forEach((key, value) -> {
+            if(!value.visited()) {
+                TopologicalSort(value, stack);
+            }
+        });
+
+        stack.push(graphVertex);
     }
 
 	private void ResetBFSAttributes() {
