@@ -12,13 +12,13 @@ public class NetworkCopyTest {
      static String graph4;
 
     //     NetworkInfluence networkInfluence;
-     static NetworkInfluenceCopySoWeDontModifySamePage network;
+     static NetworkInfluence network;
 
 
     @BeforeClass
     public static void setUp() throws Exception {
         try{
-            network = new NetworkInfluenceCopySoWeDontModifySamePage(graph1);
+            network = new NetworkInfluence(graph1);
         }catch(Exception e){
             e.printStackTrace();
         }

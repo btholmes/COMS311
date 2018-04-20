@@ -1,11 +1,6 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Scanner;
 
 public class main {
 	
@@ -27,14 +22,14 @@ public class main {
 //				System.out.println((System.currentTimeMillis() - time)/1000 + "seconds");
 
 				String file = "/Users/benholmes/Documents/GitHubRepos/COMS311/Project2/WikiCS.txt";
-				NetworkInfluenceCopySoWeDontModifySamePage network = new NetworkInfluenceCopySoWeDontModifySamePage(file);
+				NetworkInfluence network = new NetworkInfluence(file);
 //				System.out.println("Ames : " + network.influence("Ames"));
 //				System.out.println("Minneapolis : " + network.influence("Minneapolis"));
 //				System.out.println("Kansas : " + network.influence("Kansas"));
 //				System.out.println("Chicago : " + network.influence("Chicago"));
 //
 //				file = "/Users/benholmes/Documents/GitHubRepos/COMS311/Project2/graph3";
-//				network = new NetworkInfluenceCopySoWeDontModifySamePage(file);
+//				network = new NetworkInfluence(file);
 //				time = System.currentTimeMillis();
 //				System.out.println("A is : " + network.influence("A"));
 //				System.out.println("B is : " + network.influence("B"));
@@ -64,7 +59,7 @@ public class main {
 //				System.out.println((System.currentTimeMillis() - time)/1000 + "seconds");
 
 				time = System.currentTimeMillis();
-				System.out.println(network.mostInfluentialSubModular((size*9)/10));
+				System.out.println(network.mostInfluentialSubModular(10));
 				System.out.println((System.currentTimeMillis() - time)/1000 + "seconds");
 
 			}

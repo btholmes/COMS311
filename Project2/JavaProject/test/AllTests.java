@@ -10,7 +10,7 @@ public class AllTests {
     static String graph4;
 
 //    static NetworkInfluence networkInfluence;
-    static NetworkInfluenceCopySoWeDontModifySamePage network;
+    static NetworkInfluence network;
 
     // ================================================================
     // SETUP
