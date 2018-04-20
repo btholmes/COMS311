@@ -79,6 +79,7 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         }
     }
 
+//    O(1)
     public int outDegree(String v)
     {
         GraphVertex graphVertex = graphVertexHashMap.get(v);
@@ -91,8 +92,8 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         return graphVertex.GetOutDegreeSize();
     }
 
-    // TODO remove or set to private.
-    public int inDegree(String v) {
+//    O(1)
+    private int inDegree(String v) {
         GraphVertex graphVertex = graphVertexHashMap.get(v);
 
         if(graphVertex == null) {
@@ -103,6 +104,7 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         return graphVertex.GetInDegreeSize();
     }
 
+//    O(n) + Collections.sort()
     private ArrayList<String> backTrackPath(HashMap<String, String> prev, String u, String v){
         ArrayList<String> result = new ArrayList<>();
         if(u.equals(v)){
@@ -129,6 +131,7 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         return result;
     }
 
+//    O(n + e) + backtrackPath()
     public ArrayList<String> shortestPath(String u, String v)
     {
         ArrayList<String> path = new ArrayList<>();
@@ -163,7 +166,7 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         return path;
     }
 
-//    Shortest path between two nodes
+//    O(shortestPath())
     public int distance(String u, String v)
     {
         if(u.equals(v))
@@ -175,7 +178,7 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
 //        return val.size();
     }
 
-//    Shortest path again
+//    O(n * shortestPath())
     public int distance(ArrayList<String> s, String v)
     {
         Integer shortestPath = null;
@@ -199,7 +202,7 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
     //Also stores amount of nodes at each distance in distances Key = distance, value = amount of nodes
 
 //    O(n + e) = O(nodes + edges)   it's a BFS
-    public void getMinDistances(String u, HashMap<Integer, Integer> distances, HashMap<String, Integer> nodeDistances){
+    private void getMinDistances(String u, HashMap<Integer, Integer> distances, HashMap<String, Integer> nodeDistances){
         if(!graphVertexHashMap.containsKey(u)) return;
 
         Queue<String> queue = new LinkedList<>();
@@ -242,7 +245,7 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
 
     //Computes influence of a node, given its distances from all other nodes
 //    O(n)
-    public float getTotal(HashMap<Integer, Integer> distances){
+    private float getTotal(HashMap<Integer, Integer> distances){
         float result = 0.0f;
         Iterator it = distances.entrySet().iterator();
         while(it.hasNext()){
@@ -339,7 +342,7 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
 //        return sum;
     }
 
-    //Takes O(n) + O(n) for sort at end //Where n is nodes
+    //Takes O(n) + Collections.sort()
     public void getDegreeMaps(HashMap<Integer, ArrayList<String>> allValues, ArrayList<Integer> maxValues){
         Iterator it = graphVertexHashMap.entrySet().iterator();
         while(it.hasNext()){
@@ -358,7 +361,7 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         Collections.sort(maxValues);
     }
 
-//    O(k)
+//    O(n)
     public ArrayList<String> mostInfluentialDegree(int k)
     {
         if(k == 0) return new ArrayList<>();
@@ -419,7 +422,7 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         Collections.sort(maxValues);
     }
 
-//    O(k)
+//    O(n)
     public ArrayList<String> mostInfluentialModular(int k)
     {
         if(k ==0) return new ArrayList<String>();
