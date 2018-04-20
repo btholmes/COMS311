@@ -37,7 +37,7 @@ public class NetworkInfluence
             throw new Exception("Error reading file in Network Influence. Returning.");
 
         try {
-		    numVertices = Integer.parseInt(line);
+		    numVertices = Integer.parseInt(line.trim());
         } catch (Exception e) {
             throw new Exception("Error parsing the number of vertices in Network Influence. Returning.");
         }

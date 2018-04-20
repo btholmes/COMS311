@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 public class NetworkInfluenceTester {
 
-    private static final String FILE_LOCATION = "./Project2/NetworkInfluenceData.txt";
+    private static final String FILE_LOCATION = "/Users/benholmes/Documents/GitHubRepos/COMS311/Project2/NetworkInfluenceData.txt";
 
     public static void main(String[] args) throws Exception {
         TestOriginalFile();
@@ -29,6 +29,8 @@ public class NetworkInfluenceTester {
         NetworkInfluence networkInfluence = new NetworkInfluence(FILE_LOCATION);
 
         int distance;
+
+        System.out.println(networkInfluence.distance("1", "sd"));
 
         distance = networkInfluence.distance("1", "9");
         if(distance != 4)

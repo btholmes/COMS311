@@ -35,6 +35,8 @@ public class WikiCrawler {
     static int max;
     static ArrayList<String> topics;
     static String fileName;
+    static boolean foundParagraph;
+    static boolean firstLine;
 
 
     static AhoCorasick tree;
@@ -48,10 +50,13 @@ public class WikiCrawler {
         // implementation
         this.seedUrl = seedUrl;
         this.max = max;
-        this.topics = topics;
         this.fileName = fileName;
+        this.foundParagraph = false;
+        this.firstLine = true;
+        if(topics == null) this.topics = new ArrayList<>(Arrays.asList());
+        else this.topics = topics;
 
-        tree = getCorasickTree(topics);
+        tree = getCorasickTree(this.topics);
         file = new File(fileName);
     }
 
@@ -89,7 +94,7 @@ public class WikiCrawler {
             url = new URL(string);
             InputStream is = url.openStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            readUrl(seedUrl, br, visited, queue, false);
+            readUrl(seedUrl, br, visited, queue);
             br.close();
 //            if(requests % 25 == 0) Thread.sleep(3000);
 
@@ -98,7 +103,7 @@ public class WikiCrawler {
         }
     }
 
-    private void readUrl(String seedUrl, BufferedReader br, HashMap<String, Boolean> visited, Queue<String> queue, boolean foundParagraph) throws IOException {
+    private void readUrl(String seedUrl, BufferedReader br, HashMap<String, Boolean> visited, Queue<String> queue) throws IOException {
         String line = br.readLine();
         while (line != null) {
 
@@ -146,7 +151,6 @@ public class WikiCrawler {
     }
 
 
-    static boolean firstLine = true;
     private void writeToFile(String node, String edge) {
         OutputStream os = null;
         try {
@@ -174,15 +178,6 @@ public class WikiCrawler {
         }
     }
 
-    private void printGraphEdges() {
-        Iterator it = graph.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            System.out.print(pair.getKey());
-//            it.remove(); // avoids a ConcurrentModificationException
-        }
-        System.out.println();
-    }
 
     private boolean containsAllTopics() {
         boolean result = topicsMap.size() == topics.size();

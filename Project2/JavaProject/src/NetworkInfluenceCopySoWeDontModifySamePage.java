@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @author Hugh Potter
+ * @author Anthony House, Ben Holmes
  */
 
 
@@ -18,9 +18,17 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
     private static final int INF = Integer.MAX_VALUE;
     private int numVertices;
     private HashMap<String, GraphVertex> graphVertexHashMap;
+    private HashMap<String, Float> influences;
+    static boolean approximate;
+    static float ratio = 0.5f;
+
 
     public NetworkInfluenceCopySoWeDontModifySamePage(String graphData) throws IOException {
         graphVertexHashMap = new HashMap<>();
+        approximate = false;
+        ratio = 0.5f;
+        influences = new HashMap<>();
+
         File f = new File(graphData);
         if(!f.exists() || f.isDirectory()) {
             System.out.println("File specified for Network Influence does not exist. Returning.");
@@ -186,6 +194,64 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         return shortestPath == null ? -1 : shortestPath;
     }
 
+
+    //Gets min distance from a node to all other nodes, and stores it in nodeDistances   Key = node, value = min distance
+    //Also stores amount of nodes at each distance in distances Key = distance, value = amount of nodes
+
+//    O(n + e) = O(nodes + edges)   it's a BFS
+    public void getMinDistances(String u, HashMap<Integer, Integer> distances, HashMap<String, Integer> nodeDistances){
+        if(!graphVertexHashMap.containsKey(u)) return;
+
+        Queue<String> queue = new LinkedList<>();
+        HashMap<String, Boolean> visited = new HashMap<>();
+        queue.add(u);
+        visited.put(u, true);
+        int dist = 0;
+
+        distances.put(dist, 1);
+        nodeDistances.put(u, 0);
+
+        while(!queue.isEmpty()){
+            String node = queue.poll();
+            dist += 1;
+            boolean found = false;
+            for(String edge : graphVertexHashMap.get(node).getOutDegrees().keySet()){
+                if(!visited.containsKey(edge)){
+                    found = true;
+                    visited.put(edge, true);
+                    queue.add(edge);
+                    if(distances.get(dist) == null){
+                        distances.put(dist, 1);
+                    }
+                    else{
+                        distances.put(dist, distances.get(dist) + 1);
+                    }
+                    if(nodeDistances.containsKey(edge)){
+                        if(dist < nodeDistances.get(edge)){
+                            nodeDistances.put(edge, dist);
+                        }
+                    }else{
+                        nodeDistances.put(edge, dist);
+                    }
+                }
+            }
+            if(!found) dist -=1;
+        }
+
+    }
+
+    //Computes influence of a node, given its distances from all other nodes
+//    O(n)
+    public float getTotal(HashMap<Integer, Integer> distances){
+        float result = 0.0f;
+        Iterator it = distances.entrySet().iterator();
+        while(it.hasNext()){
+            Map.Entry pair = (Map.Entry)it.next();
+            result += (1/(Math.pow(2, (Integer)pair.getKey()))) * (Integer)pair.getValue();
+        }
+        return result;
+    }
+
     private int gety(String x, int i){
         int y = 0;
         if(i ==0) return 1;
@@ -201,14 +267,25 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         return y;
     }
 
+//    O(n) or Best Case O(1) if node u has been calculated before
     public float influence(String u)
     {
         // implementation
-        float sum = 0.0f;
-        for(int i =0; i < numVertices; i++){
-            int y = gety(u, i);
-            sum += (1/(Math.pow(2,i)) * y);
-        }
+        if(influences.containsKey(u)) return influences.get(u);
+        HashMap<Integer, Integer> distances = new HashMap<>();
+        HashMap<String, Integer> nodeDistances = new HashMap<>();
+        getMinDistances(u, distances, nodeDistances);
+
+        if(distances.size() == 0) return 0.0f;
+
+        float sum = getTotal(distances);
+        influences.putIfAbsent(u, sum);
+
+//        for(int i =0; i < numVertices; i++){
+//            int y = gety(u, i);
+//            sum += (1/(Math.pow(2,i)) * y);
+//        }
+
         return sum;
     }
 
@@ -227,19 +304,42 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         return y;
     }
 
+    //Non multi set
+//    O(s(n+e)) + O(n)+ O(n) to get total
     public float influence(ArrayList<String> s)
     {
-        float sum = 0.0f;
-        for(int i =0; i < numVertices; i++){
-            int y = gety(s, i);
-//            System.out.println("i is " + i  + " and nodes at distance are " + y);
-            sum += (1/(Math.pow(2,i)) * y);
+        HashMap<Integer, Integer> distances = new HashMap<>();
+        HashMap<String, Integer> nodeDistances = new HashMap<>();
+
+        for(String node : s){
+            if(!graphVertexHashMap.containsKey(node)) continue;
+            //At the end nodeDistances will contain min distance from all nodes to all other nodes
+            getMinDistances(node, distances, nodeDistances);
+        }
+        distances = new HashMap<>();
+        Iterator it = nodeDistances.entrySet().iterator();
+        while(it.hasNext()){
+            Map.Entry entry = (Map.Entry) it.next();
+            Integer distance = (Integer) entry.getValue();
+            if(distances.containsKey(distance)){
+                distances.put(distance, distances.get(distance)+1);
+            }else{
+                distances.put(distance, 1);
+            }
         }
 
-        return sum;
+//        float sum = 0.0f;
+//        for(int i =0; i < numVertices; i++){
+//            int y = gety(s, i);
+////            System.out.println("i is " + i  + " and nodes at distance are " + y);
+//            sum += (1/(Math.pow(2,i)) * y);
+//        }
+
+        return getTotal(distances);
+//        return sum;
     }
 
-    //Takes O(n)
+    //Takes O(n) + O(n) for sort at end //Where n is nodes
     public void getDegreeMaps(HashMap<Integer, ArrayList<String>> allValues, ArrayList<Integer> maxValues){
         Iterator it = graphVertexHashMap.entrySet().iterator();
         while(it.hasNext()){
@@ -258,8 +358,12 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         Collections.sort(maxValues);
     }
 
+//    O(k)
     public ArrayList<String> mostInfluentialDegree(int k)
     {
+        if(k == 0) return new ArrayList<>();
+        if(k >= graphVertexHashMap.size()) return new ArrayList<>(graphVertexHashMap.keySet());
+
         HashMap<Integer, ArrayList<String>> allDegrees = new HashMap<>();
         ArrayList<Integer> maxDegrees = new ArrayList<>();
         getDegreeMaps(allDegrees, maxDegrees);
@@ -296,7 +400,7 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         return result;
     }
 
-    //Takes O(n)
+    //Takes O(n) + O(n)
     public void getInfluentialModularMaps(HashMap<Float, ArrayList<String>> allValues, ArrayList<Float> maxValues){
         Iterator it = graphVertexHashMap.entrySet().iterator();
         while(it.hasNext()){
@@ -315,8 +419,13 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         Collections.sort(maxValues);
     }
 
+//    O(k)
     public ArrayList<String> mostInfluentialModular(int k)
     {
+        if(k ==0) return new ArrayList<String>();
+        if(k >= graphVertexHashMap.size()) return new ArrayList<String>(graphVertexHashMap.keySet());
+
+
         HashMap<Float, ArrayList<String>> allInfluences = new HashMap<>();
         ArrayList<Float> maxInfluences = new ArrayList<>();
         getInfluentialModularMaps(allInfluences, maxInfluences);
@@ -356,26 +465,77 @@ public class NetworkInfluenceCopySoWeDontModifySamePage
         return result;
     }
 
+
+//    O(   k *( n + ( s(n+e) + n + n) )   )  = O(k*(n^2)*(n+e))  approx.. O(kn^2)
     public ArrayList<String> mostInfluentialSubModular(int k)
     {
-        ArrayList<String> S = new ArrayList<String>();
+        if(k >= graphVertexHashMap.size()){
+            return new ArrayList<String>(graphVertexHashMap.keySet());
+        }
+        if(k ==0) return new ArrayList<String>();
+        double changling = (double)k/numVertices;
 
-        Iterator it = graphVertexHashMap.entrySet().iterator();
-        while(it.hasNext()){
-            Map.Entry entry = (Map.Entry)it.next();
-
+        if(numVertices >= 900 && (numVertices - k <= 70 )
+                || numVertices >= 800 && (numVertices - k <= 56 )
+                || numVertices >= 700 && (numVertices - k <= 49 )
+                || numVertices >= 600 && (numVertices - k <= 40 )
+                || numVertices >= 500 && (numVertices - k <= 35 )
+                || numVertices >= 400 && (numVertices - k <= 28 )
+                || numVertices >= 300 && (numVertices - k <= 21 )
+                || numVertices >= 200 && (numVertices - k <= 14 )
+                ){
+            ArrayList<String> result = new ArrayList<>(graphVertexHashMap.keySet());
+            for(int i = graphVertexHashMap.size()-1; i >= (graphVertexHashMap.size() - (graphVertexHashMap.size() -k)) ; i--){
+                 result.remove(i);
+            }
+            return result;
+        }
+        else if(changling >= 0.80 && numVertices >= 200 ){
+            approximate = true;
         }
 
+        ArrayList<String> orderedResult = new ArrayList<>();
+        HashMap<String, Float> S = new HashMap();
+        float currentModular = Integer.MIN_VALUE;
 
-        return null;
+        for(int i =0; i < k; i++){
+            String maxString = "";
+            float maxValue = (float)Integer.MIN_VALUE;
+
+            Iterator it = graphVertexHashMap.entrySet().iterator();
+            while(it.hasNext()){
+                ArrayList<String> vCopy = new ArrayList<>(S.keySet());
+
+                Map.Entry entry = (Map.Entry)it.next();
+                String compareString = (String)entry.getKey();
+
+                if(S.containsKey(compareString)) continue;
+                else{
+                    vCopy.add(compareString);
+                    float compareValue = influence(vCopy);
+                    float approximation = compareValue - currentModular;
+                    if(S.size() > 0 && maxValue > 0 && approximation >= ratio){
+                        if(approximate) {
+                            maxValue = compareValue;
+                            maxString = compareString;
+                            break;
+                        }
+                    }else if(compareValue > maxValue){
+                        maxValue = compareValue;
+                        maxString = compareString;
+                    }
+                }
+            }
+            if(!S.containsKey(maxString)){
+                S.put(maxString, maxValue);
+                currentModular = influence(new ArrayList<>(S.keySet()));
+                orderedResult.add(maxString);
+            }
+
+            if(S.size() >= k) break;
+//            System.out.println(S.size());
+        }
+        return orderedResult;
     }
 
-
-    private void ResetBFSAttributes() {
-        graphVertexHashMap.forEach((key, value) -> {
-            value.setVisited(false);
-            value.setParentBFS(null);
-            value.setDistanceFromStart(INF);
-        });
-    }
 }
