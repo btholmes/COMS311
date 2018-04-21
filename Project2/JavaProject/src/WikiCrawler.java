@@ -35,8 +35,8 @@ public class WikiCrawler {
     static int max;
     static ArrayList<String> topics;
     static String fileName;
-    static boolean foundParagraph;
-    static boolean firstLine;
+//    static boolean foundParagraph;
+//    static boolean firstLine;
 
 
     static AhoCorasick tree;
@@ -51,7 +51,7 @@ public class WikiCrawler {
         this.seedUrl = seedUrl;
         this.max = max;
         this.fileName = fileName;
-        this.foundParagraph = false;
+//        this.foundParagraph = false;
         this.firstLine = true;
         if(topics == null) this.topics = new ArrayList<>(Arrays.asList());
         else this.topics = topics;
@@ -94,7 +94,7 @@ public class WikiCrawler {
             url = new URL(string);
             InputStream is = url.openStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            readUrl(seedUrl, br, visited, queue);
+            readUrl(seedUrl, br, visited, queue, false);
             br.close();
 //            if(requests % 25 == 0) Thread.sleep(3000);
 
@@ -103,7 +103,7 @@ public class WikiCrawler {
         }
     }
 
-    private void readUrl(String seedUrl, BufferedReader br, HashMap<String, Boolean> visited, Queue<String> queue) throws IOException {
+    private void readUrl(String seedUrl, BufferedReader br, HashMap<String, Boolean> visited, Queue<String> queue, boolean foundParagraph) throws IOException {
         String line = br.readLine();
         while (line != null) {
 
@@ -151,6 +151,7 @@ public class WikiCrawler {
     }
 
 
+    static boolean firstLine = true;
     private void writeToFile(String node, String edge) {
         OutputStream os = null;
         try {

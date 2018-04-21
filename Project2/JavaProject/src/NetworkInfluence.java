@@ -17,7 +17,7 @@ public class NetworkInfluence
 {
     private static final int INF = Integer.MAX_VALUE;
     private int numVertices;
-    private HashMap<String, GraphVertex> graphVertexHashMap;
+    public HashMap<String, GraphVertex> graphVertexHashMap;
     private HashMap<String, Float> influences;
     static boolean approximate;
     static float ratio = 0.5f;
@@ -68,8 +68,9 @@ public class NetworkInfluence
             graphVertex1.AddOutDegreeVertex(graphVertex2);
             graphVertex2.AddInDegreeVertex(graphVertex1);
 
-            graphVertexHashMap.putIfAbsent(graphVertex1.getVertexName(), graphVertex1);
-            graphVertexHashMap.putIfAbsent(graphVertex2.getVertexName(), graphVertex2);
+
+            graphVertexHashMap.put(graphVertex1.getVertexName(), graphVertex1);
+            graphVertexHashMap.put(graphVertex2.getVertexName(), graphVertex2);
         }
 
         bufferedReader.close();
@@ -273,7 +274,6 @@ public class NetworkInfluence
 //    O(n) or Best Case O(1) if node u has been calculated before
     public float influence(String u)
     {
-        // implementation
         if(influences.containsKey(u)) return influences.get(u);
         HashMap<Integer, Integer> distances = new HashMap<>();
         HashMap<String, Integer> nodeDistances = new HashMap<>();
@@ -283,13 +283,15 @@ public class NetworkInfluence
 
         float sum = getTotal(distances);
         influences.putIfAbsent(u, sum);
+        return sum;
 
+//        float sum = 0.0f;
 //        for(int i =0; i < numVertices; i++){
 //            int y = gety(u, i);
 //            sum += (1/(Math.pow(2,i)) * y);
 //        }
-
-        return sum;
+//
+//        return sum;
     }
 
     private int gety(ArrayList<String> s, int i){
@@ -330,6 +332,9 @@ public class NetworkInfluence
                 distances.put(distance, 1);
             }
         }
+        return getTotal(distances);
+
+
 
 //        float sum = 0.0f;
 //        for(int i =0; i < numVertices; i++){
@@ -337,8 +342,6 @@ public class NetworkInfluence
 ////            System.out.println("i is " + i  + " and nodes at distance are " + y);
 //            sum += (1/(Math.pow(2,i)) * y);
 //        }
-
-        return getTotal(distances);
 //        return sum;
     }
 
@@ -380,6 +383,7 @@ public class NetworkInfluence
                 if(value == prev) continue;
 
                 ArrayList<String> nodes = allDegrees.get(value);
+
                 if(nodes.size() <= k && (added + nodes.size() < maxDegrees.size())) {
                     result.addAll(nodes);
                     k -= nodes.size();
@@ -478,24 +482,24 @@ public class NetworkInfluence
         if(k ==0) return new ArrayList<String>();
         double changling = (double)k/numVertices;
 
-        if(numVertices >= 900 && (numVertices - k <= 70 )
-                || numVertices >= 800 && (numVertices - k <= 56 )
-                || numVertices >= 700 && (numVertices - k <= 49 )
-                || numVertices >= 600 && (numVertices - k <= 40 )
-                || numVertices >= 500 && (numVertices - k <= 35 )
-                || numVertices >= 400 && (numVertices - k <= 28 )
-                || numVertices >= 300 && (numVertices - k <= 21 )
-                || numVertices >= 200 && (numVertices - k <= 14 )
-                ){
-            ArrayList<String> result = new ArrayList<>(graphVertexHashMap.keySet());
-            for(int i = graphVertexHashMap.size()-1; i >= (graphVertexHashMap.size() - (graphVertexHashMap.size() -k)) ; i--){
-                 result.remove(i);
-            }
-            return result;
-        }
-        else if(changling >= 0.80 && numVertices >= 200 ){
-            approximate = true;
-        }
+//        if(numVertices >= 900 && (numVertices - k <= 70 )
+//                || numVertices >= 800 && (numVertices - k <= 56 )
+//                || numVertices >= 700 && (numVertices - k <= 49 )
+//                || numVertices >= 600 && (numVertices - k <= 40 )
+//                || numVertices >= 500 && (numVertices - k <= 35 )
+//                || numVertices >= 400 && (numVertices - k <= 28 )
+//                || numVertices >= 300 && (numVertices - k <= 21 )
+//                || numVertices >= 200 && (numVertices - k <= 14 )
+//                ){
+//            ArrayList<String> result = new ArrayList<>(graphVertexHashMap.keySet());
+//            for(int i = graphVertexHashMap.size()-1; i >= (graphVertexHashMap.size() - (graphVertexHashMap.size() -k)) ; i--){
+//                 result.remove(i);
+//            }
+//            return result;
+//        }
+//        else if(changling >= 0.80 && numVertices >= 200 ){
+//            approximate = true;
+//        }
 
         ArrayList<String> orderedResult = new ArrayList<>();
         HashMap<String, Float> S = new HashMap();
@@ -517,12 +521,10 @@ public class NetworkInfluence
                     vCopy.add(compareString);
                     float compareValue = influence(vCopy);
                     float approximation = compareValue - currentModular;
-                    if(S.size() > 0 && maxValue > 0 && approximation >= ratio){
-                        if(approximate) {
-                            maxValue = compareValue;
-                            maxString = compareString;
-                            break;
-                        }
+                    if(approximate && S.size() > 0 && maxValue > 0 && approximation >= ratio){
+                        maxValue = compareValue;
+                        maxString = compareString;
+                        break;
                     }else if(compareValue > maxValue){
                         maxValue = compareValue;
                         maxString = compareString;
